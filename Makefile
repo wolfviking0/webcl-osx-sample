@@ -45,6 +45,7 @@ $(info )
 all: \
 	hello_sample \
 	transpose_sample \
+	histogram_sample \
 	trajectories_sample \
 	scan_sample \
 	reduce_sample \
@@ -61,6 +62,13 @@ transpose_sample:
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) transpose.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
 	$(PRELOAD) transpose_kernel.cl \
 	-o ../build/transpose.js
+
+histogram_sample: 
+	$(call chdir,gpu_histogram/)
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) gpu_histogram.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
+	$(PRELOAD) gpu_histogram_buffer.cl \
+	$(PRELOAD) gpu_histogram_image.cl \
+	-o ../build/histogram.js
 
 trajectories_sample: 
 	$(call chdir,Trajectories/)
