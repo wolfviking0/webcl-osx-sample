@@ -47,7 +47,7 @@ all: \
 	
 noise_sample: 
 	$(call chdir,OpenCL_Procedural_Noise_Example/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) noise.c -s OPENCL_VALIDATOR=1 $(MODE) \
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) noise.c -s LEGACY_GL_EMULATION=1 $(MODE) \
 	$(PRELOAD) noise_kernel.cl \
 	-o ../build/noise.js
 
