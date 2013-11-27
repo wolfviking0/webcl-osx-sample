@@ -45,6 +45,7 @@ $(info )
 all: \
 	hello_sample \
 	transpose_sample \
+	trajectories_sample \
 	scan_sample \
 	reduce_sample \
 	noise_sample \
@@ -61,10 +62,26 @@ transpose_sample:
 	$(PRELOAD) transpose_kernel.cl \
 	-o ../build/transpose.js
 
+trajectories_sample: 
+	$(call chdir,Trajectories/)
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) \
+	Sources/Main/Trajectories.cpp \
+	Sources/OpenCL/Sources/OpenCLBuffer.cpp \
+	Sources/OpenCL/Sources/OpenCLFile.cpp \
+	Sources/OpenCL/Sources/OpenCLKernel.cpp \
+	Sources/OpenCL/Sources/OpenCLProgram.cpp \
+	Sources/Trajectory/Trajectory.cpp \
+	-I./Sources/Trajectory/ \
+	-I./Sources/Main/ \
+	-I./Sources/OpenCL/Headers/ \
+	$(MODE) \
+	$(PRELOAD) Sources/Kernel/TrajectoriesKernel.cl \
+	-o ../build/trajectories.js
+
 scan_sample: 
 	$(call chdir,OpenCL_Parallel_Prefix_Sum_Example/)
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) scan.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
-	$(PRELOAD) scan_kernel.cl \
+	$(PRELOAD) TrajectoriesKernel.cl \
 	-o ../build/scan.js
 
 reduce_sample: 
