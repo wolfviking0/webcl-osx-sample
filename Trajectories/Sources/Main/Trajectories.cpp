@@ -72,7 +72,7 @@ static const float kAngle     = M_PI / 4.0f;
 
 int main( int argc, char **argv )
 {
-	Trajectory trajectory("TrajectoriesKernel.cl",kTimeMax,kTimeDelta);
+	Trajectory trajectory("Sources/Kernel/TrajectoriesKernel.cl",kTimeMax,kTimeDelta);
 	
 	if( trajectory.Acquire("Trajectory1") )
 	{

@@ -283,6 +283,8 @@ static bool TrajectoryRelease(TrajectoryStruct *pTrajectory)
 		
 		delete pTrajectory;
 	} // if
+
+	return true;
 } // TrajectoryRelease
 
 //---------------------------------------------------------------------------

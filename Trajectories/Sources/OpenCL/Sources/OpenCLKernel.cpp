@@ -53,7 +53,11 @@
 
 //---------------------------------------------------------------------------
 
+#ifdef __EMSCRIPTEN__
+#include <CL/opencl.h>
+#else
 #include <OpenCL/opencl.h>
+#endif
 
 //---------------------------------------------------------------------------
 
@@ -407,6 +411,7 @@ static bool OpenCLKernelMapClone(OpenCL::KernelStruct *pSrcKernel,
 	{
 		OpenCLKernelAcquire(pSrcKernelMapPos->first, pDstKernel);
 	} // for
+	return true;
 } // OpenCLKernelMapClone
 
 //---------------------------------------------------------------------------

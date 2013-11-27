@@ -52,7 +52,11 @@
 
 //---------------------------------------------------------------------------
 
+#ifdef __EMSCRIPTEN__
+#include <CL/opencl.h>
+#else
 #include <OpenCL/opencl.h>
+#endif
 
 //---------------------------------------------------------------------------
 
@@ -246,6 +250,19 @@ static inline bool OpenCLProgramBuild( OpenCL::ProgramStruct *pProgram )
 	
     if( !bProgramBuilt )
     {
+    	 // Determine the reason for the error
+        char buildLog[16384];
+        clGetProgramBuildInfo(
+			pProgram->mpProgram, 
+			pProgram->mnDeviceId, 
+			CL_PROGRAM_BUILD_LOG,
+            sizeof(buildLog), 
+			buildLog, 
+			NULL);
+
+        std::cerr << "Error in kernel: " << std::endl;
+        std::cerr << buildLog;
+
         std::cerr << ">> ERROR: OpenCL Program - Failed to build program executable!" << std::endl;
     } // if
 	
