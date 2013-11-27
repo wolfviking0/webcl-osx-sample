@@ -70,6 +70,8 @@
 //
 #define DATA_SIZE (1024)
 
+#define MIN_ERROR       (1e-7)
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // Simple compute kernel which computes the square of an input array 
@@ -244,8 +246,13 @@ int main(int argc, char** argv)
     correct = 0;
     for(i = 0; i < count; i++)
     {
-        if(results[i] == data[i] * data[i])
-            correct++;
+        #ifdef __EMSCRIPTEN__
+            if ((results[i] - (data[i] * data[i])) < MIN_ERROR)
+                correct++;
+        #else    
+            if(results[i] == data[i] * data[i])
+                correct++;
+        #endif           
     }
     
     // Print a brief summary detailing the results
