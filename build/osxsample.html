@@ -82,10 +82,25 @@
             
 			      switch(SAMPLE) {
         		case '0':
-          			includeJS("noise.js");     
+          			includeJS("hello.js");     
           			break;//------------
+            case '1':
+                includeJS("transpose.js");     
+                break;//------------
+            case '2':
+                includeJS("scan.js");     
+                break;//------------
+            case '3':
+                includeJS("reduce.js");     
+                break;//------------
+            case '4':
+                includeJS("noise.js");     
+                break;//------------
+            case '5':
+                includeJS("qjulia.js");     
+                break;//------------
        			default:
-          			includeJS("noise.js"); 
+          			includeJS("hello.js"); 
           			break;
       		}
         

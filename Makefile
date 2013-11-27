@@ -43,13 +43,52 @@ $(info )
 
 
 all: \
+	hello_sample \
+	transpose_sample \
+	scan_sample \
+	reduce_sample \	
 	noise_sample \
+	qjulia_sample \
 	
+hello_sample: 
+	$(call chdir,OpenCL_Hello_World_Example/)
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) hello.c $(MODE) \
+	-o ../build/hello.js
+	
+transpose_sample: 
+	$(call chdir,OpenCL_Matrix_Transpose_Example/)
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) transpose.c $(MODE) \
+	$(PRELOAD) transpose_kernel.cl \
+	-o ../build/transpose.js
+
+scan_sample: 
+	$(call chdir,OpenCL_Parallel_Prefix_Sum_Example/)
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) scan.c $(MODE) \
+	$(PRELOAD) scan_kernel.cl \
+	-o ../build/scan.js
+
+reduce_sample: 
+	$(call chdir,OpenCL_Parallel_Reduction_Example/)
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) reduce.c $(MODE) \
+	$(PRELOAD) reduce_float_kernel.cl \
+	$(PRELOAD) reduce_float2_kernel.cl \
+	$(PRELOAD) reduce_float4_kernel.cl \
+	$(PRELOAD) reduce_int_kernel.cl \
+	$(PRELOAD) reduce_int2_kernel.cl \
+	$(PRELOAD) reduce_int4_kernel.cl \
+	-o ../build/reduce.js
+
 noise_sample: 
 	$(call chdir,OpenCL_Procedural_Noise_Example/)
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) noise.c -s LEGACY_GL_EMULATION=1 $(MODE) \
 	$(PRELOAD) noise_kernel.cl \
 	-o ../build/noise.js
+
+qjulia_sample: 
+	$(call chdir,OpenCL_RayTraced_Quaternion_Julia-Set_Example/)
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) qjulia.c -s LEGACY_GL_EMULATION=1 $(MODE) \
+	$(PRELOAD) qjulia_kernel.cl \
+	-o ../build/qjulia.js	
 
 clean:
 	$(call chdir,build/)
