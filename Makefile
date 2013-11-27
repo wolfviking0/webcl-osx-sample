@@ -46,7 +46,7 @@ all: \
 	hello_sample \
 	transpose_sample \
 	scan_sample \
-	reduce_sample \	
+	reduce_sample \
 	noise_sample \
 	qjulia_sample \
 
@@ -69,7 +69,7 @@ scan_sample:
 
 reduce_sample: 
 	$(call chdir,OpenCL_Parallel_Reduction_Example/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) reduce.c $(MODE) \
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) reduce.c $(MODE) -s TOTAL_MEMORY=1024*1024*50 \
 	$(PRELOAD) reduce_float_kernel.cl \
 	$(PRELOAD) reduce_float2_kernel.cl \
 	$(PRELOAD) reduce_float4_kernel.cl \
