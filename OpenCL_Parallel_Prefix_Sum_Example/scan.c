@@ -53,16 +53,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <libc.h>
 #include <stdbool.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <mach/mach_time.h>
 #include <math.h>
 
-#include <OpenCL/opencl.h>
+#ifdef __EMSCRIPTEN__
+    #include <CL/opencl.h>
+#else
+    #include <libc.h>
+    #include <mach/mach_time.h>
+    #include <OpenCL/opencl.h>
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -112,26 +116,43 @@ static const unsigned int KernelCount = sizeof(KernelNames) / sizeof(char *);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-uint64_t
+#ifdef __EMSCRIPTEN__
+static float
+#else
+static uint64_t
+#endif
 GetCurrentTime()
 {
-    return mach_absolute_time();
+    #ifdef __EMSCRIPTEN__
+        return emscripten_get_now();
+    #else
+        return mach_absolute_time();
+    #endif
 }
-	
-double 
+
+#ifdef __EMSCRIPTEN__
+static float
+SubtractTimeInSec( float endtime, float starttime )
+#else
+static double
 SubtractTimeInSec( uint64_t endtime, uint64_t starttime )
-{    
-	static double conversion = 0.0;
-	uint64_t difference = endtime - starttime;
-	if( 0 == conversion )
-	{
-		mach_timebase_info_data_t timebase;
-		kern_return_t kError = mach_timebase_info( &timebase );
-		if( kError == 0  )
-			conversion = 1e-9 * (double) timebase.numer / (double) timebase.denom;
-    }
-		
-	return conversion * (double) difference; 
+#endif 
+{
+    #ifdef __EMSCRIPTEN__
+        return 0.001f * (endtime - starttime);
+    #else
+    	static double conversion = 0.0;
+    	uint64_t difference = endtime - starttime;
+    	if( 0 == conversion )
+    	{
+    		mach_timebase_info_data_t timebase;
+    		kern_return_t kError = mach_timebase_info( &timebase );
+    		if( kError == 0  )
+    			conversion = 1e-9 * (double) timebase.numer / (double) timebase.denom;
+        }
+    		
+    	return conversion * (double) difference; 
+    #endif
 }
 
 static char *
@@ -595,9 +616,15 @@ void ScanReference( float* reference, float* input, const unsigned int count)
 int main(int argc, char **argv)
 {
     int i;
+    #ifdef __EMSCRIPTEN__
+    float         t0 = 0;
+    float         t1 = 0;
+    float         t2 = 0;
+    #else
     uint64_t         t0 = 0;
     uint64_t         t1 = 0;
     uint64_t         t2 = 0;
+    #endif
     int              err = 0;
     cl_mem			 output_buffer;
     cl_mem           input_buffer;
@@ -637,7 +664,7 @@ int main(int argc, char **argv)
     if (err != CL_SUCCESS)
     {
         printf("Error: Failed to retrieve device info!\n");
-        return EXIT_FAILURE;
+        //return EXIT_FAILURE;
     }
 
     printf(SEPARATOR);
