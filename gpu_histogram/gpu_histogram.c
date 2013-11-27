@@ -57,8 +57,12 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#ifdef __EMSCRIPTEN__
+#include <CL/opencl.h>
+#else
 #include <OpenCL/opencl.h>
 #include <mach/mach_time.h>
+#endif
 #include <math.h>
 
 #define test_start()
@@ -84,7 +88,7 @@ create_image_data_unorm8(int w, int h)
     int             i;
     
     for (i=0; i<w*h*4; i++)
-        p[i] = (unsigned char)(random() & 0xFF);
+        p[i] = (unsigned char)(rand() & 0xFF);
 
     return (void *)p;
 }
@@ -136,7 +140,7 @@ create_image_data_fp32(int w, int h)
     int     i;
     
     for (i=0; i<w*h*4; i++)
-        p[i] = (float)random() / (float)RAND_MAX;
+        p[i] = (float)rand() / (float)RAND_MAX;
 
     return (void *)p;
 }
@@ -270,14 +274,18 @@ test_histogram_with_buffers(cl_context context, cl_command_queue queue, cl_devic
     cl_mem              partial_histogram_buffer;
 	size_t              src_len[1];
     char                *source[1];
+    #ifdef __EMSCRIPTEN__
+    float               t1, t2;
+    #else
     uint64_t            t1, t2;
+    #endif
     int                 i, err;
 
     log_info("==============================\n");
     log_info("Testing Histogram with Buffers\n");
     log_info("==============================\n");
     
-    srandom(0);
+    srand(time(0));
     
     err = read_kernel_from_file(cl_kernel_histogram_buffer_filename, &source[0], &src_len[0]);
     if(err)
@@ -437,7 +445,11 @@ test_histogram_with_buffers(cl_context context, cl_command_queue queue, cl_devic
     verify_histogram_results("RGBA 8-bit", gpu_histogram_results, ref_histogram_results, 256*3);
     
     // now measure performance
+    #ifdef __EMSCRIPTEN__
+    t1 = emscripten_get_now();
+    #else
     t1 = mach_absolute_time();
+    #endif
     for (i=0; i<num_iterations; i++)
     {
         err = clEnqueueNDRangeKernel(queue, histogram_rgba_unorm8, 1, NULL, global_work_size, local_work_size, 0, NULL, NULL);
@@ -457,6 +469,16 @@ test_histogram_with_buffers(cl_context context, cl_command_queue queue, cl_devic
         }
     }
     clFinish(queue);
+    #ifdef __EMSCRIPTEN__
+    t2 = emscripten_get_now();
+    
+    {
+        double t;
+
+        t = 0.001f * (t2 - t1);
+        log_perf(1000.0*t, 0, "ms", "Time to compute RGBA unorm8 histogram\n");
+    }
+    #else
     t2 = mach_absolute_time();
         
     {
@@ -468,6 +490,7 @@ test_histogram_with_buffers(cl_context context, cl_command_queue queue, cl_devic
         t = 1e-9*(t2-t1)*info.numer / (info.denom * num_iterations);
         log_perf(1000.0*t, 0, "ms", "Time to compute RGBA unorm8 histogram\n");
     }
+    #endif
 
     /************  Testing RGBA 32-bit fp histogram **********/
 
@@ -532,7 +555,11 @@ test_histogram_with_buffers(cl_context context, cl_command_queue queue, cl_devic
     verify_histogram_results("RGBA fp32", gpu_histogram_results, ref_histogram_results, 257*3);
 
     // now measure performance
+    #ifdef __EMSCRIPTEN__
+    t1 = emscripten_get_now();
+    #else
     t1 = mach_absolute_time();
+    #endif
     for (i=0; i<num_iterations; i++)
     {
         err = clEnqueueNDRangeKernel(queue, histogram_rgba_fp32, 1, NULL, global_work_size, local_work_size, 0, NULL, NULL);
@@ -552,6 +579,17 @@ test_histogram_with_buffers(cl_context context, cl_command_queue queue, cl_devic
         }
     }
     clFinish(queue);
+        
+    #ifdef __EMSCRIPTEN__
+    t2 = emscripten_get_now();
+    
+    {
+        double t;
+
+        t = 0.001f * (t2 - t1);
+        log_perf(1000.0*t, 0, "ms", "Time to compute RGBA fp32 histogram\n");
+    }
+    #else
     t2 = mach_absolute_time();
         
     {
@@ -563,6 +601,7 @@ test_histogram_with_buffers(cl_context context, cl_command_queue queue, cl_devic
         t = 1e-9*(t2-t1)*info.numer / (info.denom * num_iterations);
         log_perf(1000.0*t, 0, "ms", "Time to compute RGBA fp32 histogram\n");
     }
+    #endif
 
     free(ref_histogram_results);
     free(gpu_histogram_results);
@@ -614,7 +653,11 @@ test_histogram_with_images(cl_context context, cl_command_queue queue, cl_device
     cl_mem              partial_histogram_buffer;
 	size_t              src_len[1];
     char                *source[1];
+    #ifdef __EMSCRIPTEN__
+    float               t1, t2;
+    #else
     uint64_t            t1, t2;
+    #endif
     int                 i, err;
 
 
@@ -622,7 +665,7 @@ test_histogram_with_images(cl_context context, cl_command_queue queue, cl_device
     log_info("Testing Histogram with Images\n");
     log_info("=============================\n");
     
-    srandom(0);
+    srand(time(0));
     
     err = read_kernel_from_file(cl_kernel_histogram_image_filename, &source[0], &src_len[0]);
     if(err)
@@ -801,7 +844,11 @@ test_histogram_with_images(cl_context context, cl_command_queue queue, cl_device
     verify_histogram_results("RGBA 8-bit", gpu_histogram_results, ref_histogram_results, 256*3);
     
     // now measure performance
+    #ifdef __EMSCRIPTEN__
+    t1 = emscripten_get_now();
+    #else
     t1 = mach_absolute_time();
+    #endif
     for (i=0; i<num_iterations; i++)
     {
         err = clEnqueueNDRangeKernel(queue, histogram_rgba_unorm8, 2, NULL, global_work_size, local_work_size, 0, NULL, NULL);
@@ -821,6 +868,16 @@ test_histogram_with_images(cl_context context, cl_command_queue queue, cl_device
         }        
     }
     clFinish(queue);
+    #ifdef __EMSCRIPTEN__
+    t2 = emscripten_get_now();
+    
+    {
+        double t;
+
+        t = 0.001f * (t2 - t1);
+        log_perf(1000.0*t, 0, "ms", "Time to compute RGBA unorm8 histogram\n");
+    }
+    #else
     t2 = mach_absolute_time();
         
     {
@@ -832,6 +889,7 @@ test_histogram_with_images(cl_context context, cl_command_queue queue, cl_device
         t = 1e-9*(t2-t1)*info.numer / (info.denom * num_iterations);
         log_perf(1000.0*t, 0, "ms", "Time to compute RGBA unorm8 histogram\n");
     }
+    #endif
 
     /************  Testing RGBA 32-bit fp histogram **********/
 
@@ -919,7 +977,11 @@ test_histogram_with_images(cl_context context, cl_command_queue queue, cl_device
     verify_histogram_results("RGBA fp32", gpu_histogram_results, ref_histogram_results, 257*3);
 
     // now measure performance
+    #ifdef __EMSCRIPTEN__
+    t1 = emscripten_get_now();
+    #else
     t1 = mach_absolute_time();
+    #endif
     for (i=0; i<num_iterations; i++)
     {
         err = clEnqueueNDRangeKernel(queue, histogram_rgba_fp, 2, NULL, global_work_size, local_work_size, 0, NULL, NULL);
@@ -939,6 +1001,16 @@ test_histogram_with_images(cl_context context, cl_command_queue queue, cl_device
         }        
     }
     clFinish(queue);
+    #ifdef __EMSCRIPTEN__
+    t2 = emscripten_get_now();
+    
+    {
+        double t;
+
+        t = 0.001f * (t2 - t1);
+        log_perf(1000.0*t, 0, "ms", "Time to compute RGBA fp32 histogram\n");
+    }
+    #else
     t2 = mach_absolute_time();
         
     {
@@ -950,6 +1022,7 @@ test_histogram_with_images(cl_context context, cl_command_queue queue, cl_device
         t = 1e-9*(t2-t1)*info.numer / (info.denom * num_iterations);
         log_perf(1000.0*t, 0, "ms", "Time to compute RGBA fp32 histogram\n");
     }
+    #endif    
 
     free(ref_histogram_results);
     free(gpu_histogram_results);

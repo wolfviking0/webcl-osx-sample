@@ -60,7 +60,7 @@
 //
 // final summed results are returned in histogram.
 //
-kernel
+__kernel
 void histogram_sum_partial_results_fp(global uint *partial_histogram, int num_groups, global uint *histogram)
 {
     int     tid = (int)get_global_id(0);
@@ -99,7 +99,7 @@ void histogram_sum_partial_results_fp(global uint *partial_histogram, int num_gr
 // partial_histogram is an array of num_groups * (257 * 3 * 32-bits/entry) entries
 // we store 257 Red bins, followed by 257 Green bins and then the 257 Blue bins.
 //
-kernel
+__kernel
 void histogram_rgba_fp32(global float4 *image_ptr, int image_width, int image_height, global uint *histogram)
 {
     int     tid = (int)get_local_id(0);
@@ -168,7 +168,7 @@ void histogram_rgba_fp32(global float4 *image_ptr, int image_width, int image_he
 // partial_histogram is an array of num_groups * (257 * 3 * 32-bits/entry) entries
 // we store 257 Red bins, followed by 257 Green bins and then the 257 Blue bins.
 //
-kernel
+__kernel
 void histogram_rgba_fp16(global half *image_ptr, int image_width, int image_height, global uint *histogram)
 {
     int     tid = (int)get_local_id(0);
@@ -243,7 +243,7 @@ void histogram_rgba_fp16(global half *image_ptr, int image_width, int image_heig
 //
 // final summed results are returned in histogram.
 //
-kernel
+__kernel
 void histogram_sum_partial_results_unorm8(global uint *partial_histogram, int num_groups, global uint *histogram)
 {
     int     tid = (int)get_global_id(0);
@@ -269,7 +269,7 @@ void histogram_sum_partial_results_unorm8(global uint *partial_histogram, int nu
 // partial_histogram is an array of num_groups * (256 * 3 * 32-bits/entry) entries
 // we store 256 Red bins, followed by 256 Green bins and then the 256 Blue bins.
 //
-kernel
+__kernel
 void histogram_rgba_unorm8(global uchar4 *image_ptr, int image_width, int image_height, global uint *histogram)
 {
     int     tid = (int)get_local_id(0);

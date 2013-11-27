@@ -65,7 +65,7 @@ transpose_sample:
 
 histogram_sample: 
 	$(call chdir,gpu_histogram/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) gpu_histogram.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) gpu_histogram.c $(MODE) -s TOTAL_MEMORY=1024*1024*100 \
 	$(PRELOAD) gpu_histogram_buffer.cl \
 	$(PRELOAD) gpu_histogram_image.cl \
 	-o ../build/histogram.js
