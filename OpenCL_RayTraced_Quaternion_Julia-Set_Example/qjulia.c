@@ -64,6 +64,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#ifdef __EMSCRIPTEN__
+#include <GL/gl.h>
+#include <GL/glut.h>
+#include <CL/opencl.h>
+#else
 #include <OpenGL/OpenGL.h>
 #include <OpenGL/gl.h>
 #include <OpenGL/CGLDevice.h>
@@ -71,6 +76,7 @@
 #include <OpenCL/opencl.h>
 
 #include <mach/mach_time.h>
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -156,26 +162,43 @@ DivideUp(int a, int b)
     return ((a % b) != 0) ? (a / b + 1) : (a / b);
 }
 
+#ifdef __EMSCRIPTEN__
+static float
+#else
 static uint64_t
+#endif
 GetCurrentTime()
 {
-    return mach_absolute_time();
+    #ifdef __EMSCRIPTEN__
+        return emscripten_get_now();
+    #else
+        return mach_absolute_time();
+    #endif
 }
-	
-static double 
+
+#ifdef __EMSCRIPTEN__
+static float
+SubtractTime( float uiEndTime, float uiStartTime )
+#else
+static double
 SubtractTime( uint64_t uiEndTime, uint64_t uiStartTime )
-{    
-	static double s_dConversion = 0.0;
-	uint64_t uiDifference = uiEndTime - uiStartTime;
-	if( 0.0 == s_dConversion )
-	{
-		mach_timebase_info_data_t kTimebase;
-		kern_return_t kError = mach_timebase_info( &kTimebase );
-		if( kError == 0  )
-			s_dConversion = 1e-9 * (double) kTimebase.numer / (double) kTimebase.denom;
-    }
-		
-	return s_dConversion * (double) uiDifference; 
+#endif 
+{
+    #ifdef __EMSCRIPTEN__
+        return 0.001f * (uiEndTime - uiStartTime);
+    #else
+        static double s_dConversion = 0.0;
+        uint64_t uiDifference = uiEndTime - uiStartTime;
+        if( 0.0 == s_dConversion )
+        {
+            mach_timebase_info_data_t kTimebase;
+            kern_return_t kError = mach_timebase_info( &kTimebase );
+            if( kError == 0  )
+                s_dConversion = 1e-9 * (double) kTimebase.numer / (double) kTimebase.denom;
+        }
+            
+        return s_dConversion * (double) uiDifference; 
+    #endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -236,6 +259,7 @@ static void DrawString(float x, float y, float color[4], char *buffer)
 
 static void DrawText(float x, float y, int light, char *format, ...)
 {
+#ifndef __EMSCRIPTEN__    
     va_list args;
     char buffer[256];
     GLint iVP[4];
@@ -289,6 +313,7 @@ static void DrawText(float x, float y, int light, char *format, ...)
 
     glPopAttrib();
     glViewport(iVP[0], iVP[1], iVP[2], iVP[3]);
+#endif    
 }
 
 static void 
@@ -303,11 +328,17 @@ CreateTexture(uint width, uint height)
     TextureWidth = width;
     TextureHeight = height;
     
+    #ifndef __EMSCRIPTEN__
     glActiveTextureARB(ActiveTextureUnit);
+    #else
+    glActiveTexture(ActiveTextureUnit);
+    #endif
     glGenTextures(1, &TextureId);
     glBindTexture(TextureTarget, TextureId);
+    #ifndef __EMSCRIPTEN__
     glTexParameteri(TextureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(TextureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    #endif
     glTexParameteri(TextureTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(TextureTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexImage2D(TextureTarget, 0, TextureInternal, TextureWidth, TextureHeight, 0, 
@@ -339,22 +370,46 @@ RenderTexture( void *pvData )
         glTexSubImage2D(TextureTarget, 0, 0, 0, TextureWidth, TextureHeight, 
                         TextureFormat, TextureType, pvData);
 
-    glTexParameteri(TextureTarget, GL_TEXTURE_COMPARE_MODE_ARB, GL_NONE);
-    glBegin( GL_QUADS );
-    {
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glTexCoord2f( 0.0f, 0.0f );
-        glVertex3f( -1.0f, -1.0f, 0.0f );
+    #ifdef __EMSCRIPTEN__
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        glDisableClientState(GL_VERTEX_ARRAY);
 
-        glTexCoord2f( 0.0f, 1.0f );
-        glVertex3f( -1.0f, 1.0f, 0.0f );
+        glBegin( GL_QUADS );
+        {
+            glColor3f(1.0f, 1.0f, 1.0f);
+            glTexCoord2f( 0.0f, 0.0f );
+            glVertex3f( -1.0f, -1.0f, 0.0f );
+            
+            glColor3f(1.0f, 1.0f, 1.0f);
+            glTexCoord2f( 0.0f, 1.0f );
+            glVertex3f( -1.0f, 1.0f, 0.0f );
+            
+            glColor3f(1.0f, 1.0f, 1.0f);
+            glTexCoord2f( 1.0f, 1.0f );
+            glVertex3f( 1.0f, 1.0f, 0.0f );
+            
+            glColor3f(1.0f, 1.0f, 1.0f);
+            glTexCoord2f( 1.0f, 0.0f );
+            glVertex3f( 1.0f, -1.0f, 0.0f );
+        }
+    #else
+        glTexParameteri(TextureTarget, GL_TEXTURE_COMPARE_MODE_ARB, GL_NONE);
+        glBegin( GL_QUADS );
+        {
+            glColor3f(1.0f, 1.0f, 1.0f);
+            glTexCoord2f( 0.0f, 0.0f );
+            glVertex3f( -1.0f, -1.0f, 0.0f );
 
-        glTexCoord2f( 1.0f, 1.0f );
-        glVertex3f( 1.0f, 1.0f, 0.0f );
+            glTexCoord2f( 0.0f, 1.0f );
+            glVertex3f( -1.0f, 1.0f, 0.0f );
 
-        glTexCoord2f( 1.0f, 0.0f );
-        glVertex3f( 1.0f, -1.0f, 0.0f );
-    }
+            glTexCoord2f( 1.0f, 1.0f );
+            glVertex3f( 1.0f, 1.0f, 0.0f );
+
+            glTexCoord2f( 1.0f, 0.0f );
+            glVertex3f( 1.0f, -1.0f, 0.0f );
+        }
+    #endif    
     glEnd();
     glBindTexture( TextureTarget, 0 );
     glDisable( TextureTarget );
@@ -581,17 +636,29 @@ SetupComputeDevices(int gpu)
     printf(SEPARATOR);
     printf("Using active OpenGL context...\n");
 
-    CGLContextObj kCGLContext = CGLGetCurrentContext();              
-    CGLShareGroupObj kCGLShareGroup = CGLGetShareGroup(kCGLContext);
-    
+    #ifndef __EMSCRIPTEN__
+        CGLContextObj kCGLContext = CGLGetCurrentContext();              
+        CGLShareGroupObj kCGLShareGroup = CGLGetShareGroup(kCGLContext);
+    #endif
+
     cl_context_properties properties[] = { 
+    #ifdef __EMSCRIPTEN__
+        CL_CGL_SHAREGROUP_KHR,
+        0,
+    #else
         CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, 
-        (cl_context_properties)kCGLShareGroup, 0 
+        (cl_context_properties)kCGLShareGroup,
+    #endif
+        0
     };
         
     // Create a context from a CGL share group
     //
+    #ifndef __EMSCRIPTEN__
     ComputeContext = clCreateContext(properties, 0, 0, clLogMessagesToStdoutAPPLE, 0, 0);
+    #else
+    ComputeContext = clCreateContext(properties, 0, 0, NULL, 0, 0);
+    #endif
     if (!ComputeContext)
     {
         printf("Error: Failed to create a compute context!\n");
@@ -611,7 +678,11 @@ SetupComputeDevices(int gpu)
   
     // Create a context containing the compute device(s)
     //
+    #ifndef __EMSCRIPTEN__
     ComputeContext = clCreateContext(0, 1, &ComputeDeviceId, clLogMessagesToStdoutAPPLE, NULL, &err);
+    #else
+    ComputeContext = clCreateContext(0, 1, &ComputeDeviceId, NULL, NULL, &err);
+    #endif    
     if (!ComputeContext)
     {
         printf("Error: Failed to create a compute context!\n");
@@ -670,7 +741,7 @@ SetupComputeDevices(int gpu)
     if (err != CL_SUCCESS)
     {
         printf("Error: Failed to retrieve device info!\n");
-        return EXIT_FAILURE;
+        //return EXIT_FAILURE;
     }
 
     printf(SEPARATOR);
@@ -912,31 +983,43 @@ ReportInfo(void)
 
 static void 
 ReportStats(
+#ifdef __EMSCRIPTEN__    
+    float uiStartTime, float uiEndTime)
+#else
     uint64_t uiStartTime, uint64_t uiEndTime)
+#endif
 {
     TimeElapsed += SubtractTime(uiEndTime, uiStartTime);
 
     if(TimeElapsed && FrameCount && FrameCount > ReportStatsInterval) 
-	{
+    {
         double fMs = (TimeElapsed * 1000.0 / (double) FrameCount);
         double fFps = 1.0 / (fMs / 1000.0);
-        
+#ifdef __EMSCRIPTEN__
+        printf("[%s] Compute: %3.2f ms  Display: %3.2f fps (%s)\n",
+                (ComputeDeviceType == CL_DEVICE_TYPE_GPU) ? "GPU" : "CPU",
+                fMs, fFps, USE_GL_ATTACHMENTS ? "attached" : "copying");
+#else
         sprintf(StatsString, "[%s] Compute: %3.2f ms  Display: %3.2f fps (%s)\n", 
                 (ComputeDeviceType == CL_DEVICE_TYPE_GPU) ? "GPU" : "CPU", 
                 fMs, fFps, USE_GL_ATTACHMENTS ? "attached" : "copying");
-		
-		glutSetWindowTitle(StatsString);
+        glutSetWindowTitle(StatsString);
+#endif
 
-		FrameCount = 0;
+        FrameCount = 0;
         TimeElapsed = 0;
-	}    
+    }    
 }
 
 static void
 Display(void)
 {
     FrameCount++;
+    #ifdef __EMSCRIPTEN__
+    float uiStartTime = GetCurrentTime();
+    #else
     uint64_t uiStartTime = GetCurrentTime();
+    #endif
     
     glClearColor (0.0, 0.0, 0.0, 0.0);
     glClear (GL_COLOR_BUFFER_BIT);
@@ -962,9 +1045,17 @@ Display(void)
     
     glFinish(); // for timing
     
+    #ifdef __EMSCRIPTEN__
+    float uiEndTime = GetCurrentTime();
+    #else
     uint64_t uiEndTime = GetCurrentTime();
+    #endif   
+     
     ReportStats(uiStartTime, uiEndTime);
-    DrawText(TextOffset[0], TextOffset[1], 1, (Animated == 0) ? "Press space to animate" : " ");
+    #ifndef __EMSCRIPTEN__
+        DrawText(TextOffset[0], TextOffset[1], 1, (Animated == 0) ? "Press space to animate" : " ");
+    #endif
+    
     glutSwapBuffers();
 }
 
@@ -1004,7 +1095,11 @@ void Keyboard( unsigned char key, int x, int y )
 
       case ' ':
          Animated = !Animated;
+#ifdef __EMSCRIPTEN__
+         printf("Animated = %s\n", Animated ? "true" : "false");
+#else
          sprintf(InfoString, "Animated = %s\n", Animated ? "true" : "false");
+#endif
          ShowInfo = 1;
          break;
 
@@ -1020,14 +1115,22 @@ void Keyboard( unsigned char key, int x, int y )
       case '=':
          if(Epsilon >= 0.002f)
              Epsilon *= (1.0f / 1.05f);
+#ifdef __EMSCRIPTEN__
+         printf("Epsilon = %f\n", Epsilon);
+#else
          sprintf(InfoString, "Epsilon = %f\n", Epsilon);
+#endif
          ShowInfo = 1;
          break;
 
       case '-':
          if(Epsilon < 0.01f)
              Epsilon *= 1.05f;
+#ifdef __EMSCRIPTEN__
+         printf("Epsilon = %f\n", Epsilon);
+#else
          sprintf(InfoString, "Epsilon = %f\n", Epsilon);
+#endif
          ShowInfo = 1;
          break;
 
