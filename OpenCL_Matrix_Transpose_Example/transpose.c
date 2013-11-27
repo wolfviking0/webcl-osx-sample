@@ -73,14 +73,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <libc.h>
 #include <stdbool.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef __EMSCRIPTEN__
+#include <CL/opencl.h>
+#else
+#include <libc.h>
 #include <OpenCL/opencl.h>
 #include <mach/mach_time.h>
+#endif
 #include <math.h>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -123,7 +127,12 @@ load_program_source(const char *filename)
 
 int main(int argc, char **argv)
 {
-    uint64_t         t0, t1, t2;
+    #ifdef __EMSCRIPTEN__
+        float               t0, t1, t2;
+    #else
+        uint64_t            t0, t1, t2;
+    #endif
+
     int              err;
     cl_device_id     device_id;
     cl_context       context;
@@ -275,12 +284,20 @@ int main(int argc, char **argv)
 
     int k;
     err = CL_SUCCESS;
-    t0 = t1 = mach_absolute_time();
+    #ifdef __EMSCRIPTEN__
+        t0 = t1 = emscripten_get_now();
+    #else
+        t0 = t1 = mach_absolute_time();
+    #endif
     for (k = 0 ; k < iterations; k++)
         err |= clEnqueueNDRangeKernel(queue, kernel, 2, NULL, global, local, 0, NULL, NULL);
 
     clFinish(queue);
-    t2 = mach_absolute_time();
+    #ifdef __EMSCRIPTEN__
+        t2 = emscripten_get_now();
+    #else
+        t2 = mach_absolute_time();
+    #endif
     if (err != CL_SUCCESS)
     {
         printf("Error: Failed to execute kernel!\n");
@@ -289,9 +306,13 @@ int main(int argc, char **argv)
 
     // Calculate the total bandwidth that was obtained on the device for all memory transfers
     //
-    struct mach_timebase_info info;
-    mach_timebase_info(&info);
-    double t = 1e-9 * (t2 - t1) * info.numer / info.denom;
+    #ifdef __EMSCRIPTEN__
+        double t =  0.001f * (t2 - t1);
+    #else
+        struct mach_timebase_info info;
+        mach_timebase_info(&info);
+        double t = 1e-9 * (t2 - t1) * info.numer / info.denom;
+    #endif        
     printf("Bandwidth Achieved = %f GB/sec\n", 2e-9 * sizeof(float) * width * height * iterations / t);
 
     // Verify the results are correct by performing the matrix transpose on the host

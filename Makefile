@@ -49,7 +49,7 @@ all: \
 	reduce_sample \	
 	noise_sample \
 	qjulia_sample \
-	
+
 hello_sample: 
 	$(call chdir,OpenCL_Hello_World_Example/)
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) hello.c $(MODE) \
@@ -57,13 +57,13 @@ hello_sample:
 	
 transpose_sample: 
 	$(call chdir,OpenCL_Matrix_Transpose_Example/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) transpose.c $(MODE) \
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) transpose.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
 	$(PRELOAD) transpose_kernel.cl \
 	-o ../build/transpose.js
 
 scan_sample: 
 	$(call chdir,OpenCL_Parallel_Prefix_Sum_Example/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) scan.c $(MODE) \
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) scan.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
 	$(PRELOAD) scan_kernel.cl \
 	-o ../build/scan.js
 
