@@ -148,6 +148,8 @@ GLuint value_texture_for(const T &t)
 
 static void drawMarks(CGContextRef gc, int width, int height, int max)
 {
+    printf("\todo hud.cpp line 150\n");
+    /*
     float   angle, c, s, tick, radius, needle;
     float   r0, r1, r2, r3, cx, cy;
     int     i, start, end, redline, section;
@@ -245,10 +247,13 @@ static void drawMarks(CGContextRef gc, int width, int height, int max)
         CGContextShowTextAtPoint(gc, cx - r0*c + dx, cy + r0*s + dy,
                                  text, strlen(text));
     }
+    */
 }
 
 static void initBackground(unsigned w, unsigned h, unsigned max)
 {
+    printf("\todo hud.cpp line 254\n");
+    /*
     CGColorSpaceRef colorspace;
     CGContextRef  gc;
     unsigned char *data;
@@ -340,6 +345,7 @@ static void initBackground(unsigned w, unsigned h, unsigned max)
     CGContextRelease(gc);
     CGColorSpaceRelease(colorspace);
     free(data);
+     */
 }
 
 static float angleForValue(float val, int max)
@@ -349,9 +355,11 @@ static float angleForValue(float val, int max)
 
     return  M_PI / 6 - (2.0 / 3.0)*(2*M_PI)*val / max;
 }
-
+/*
 static void drawNeedle(CGContextRef gc, int w, int h, float angle)
 {
+    printf("\todo hud.cpp line 360\n");
+    
     float dx, dy, cx, cy, radius, needle;
 
     cx    = CENTERX * w;
@@ -372,10 +380,13 @@ static void drawNeedle(CGContextRef gc, int w, int h, float angle)
     CGContextAddLineToPoint(gc, cx - NEEDLE_THICKNESS*dx - 0.5*NEEDLE_THICKNESS*dy,
                             cy - NEEDLE_THICKNESS*dy + 0.5*NEEDLE_THICKNESS*dx);
     CGContextFillPath(gc);
-}
 
+}
+*/
 static void initNeedle(unsigned w, unsigned h, unsigned max)
 {
+    printf("\todo hud.cpp line 388\n");
+    /*
     CGColorSpaceRef colorspace;
     CGContextRef  gc;
     unsigned char *data;
@@ -450,6 +461,7 @@ static void initNeedle(unsigned w, unsigned h, unsigned max)
     CGContextRelease(gc);
     CGColorSpaceRelease(colorspace);
     free(data);
+    */
 }
 
 //----------------------------------------------------------------------------
@@ -501,7 +513,7 @@ void SmoothMeter::update()
 
 void SmoothMeter::draw()
 {
-    int value = lrint(_smoothValue);
+    int value = (int)lrint(_smoothValue);
     float angle = angleForValue(_smoothValue, _max) * 180 / M_PI;
 
     if (0 == _backgroundTexture)
@@ -601,7 +613,7 @@ void DrawButton(Button const *button)
     glVertex2f(button->x(), button->y() + button->h());
     glEnd();
 }
-
+/*
 static void AddRoundedRectToPath(CGContextRef context, CGRect rect,
                                  float ovalWidth, float ovalHeight)
 {
@@ -630,9 +642,12 @@ static void AddRoundedRectToPath(CGContextRef context, CGRect rect,
 
     CGContextRestoreGState(context);
 }
+*/
 
 void InitButton(unsigned w, unsigned h)
 {
+    printf("\todo hud.cpp line 649\n");
+    /*
     CGColorSpaceRef colorspace;
     CGContextRef  gc;
     unsigned char *data;
@@ -681,4 +696,5 @@ void InitButton(unsigned w, unsigned h)
     CGContextRelease(gc);
     CGColorSpaceRelease(colorspace);
     free(data);
+    */
 }

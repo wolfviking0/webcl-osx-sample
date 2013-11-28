@@ -705,7 +705,7 @@ void DrawHeadsUpDisplay(void)
 
     if (ShowYear)
     {
-        YearCounter.setCounter(lrint(ActiveSimulator->getYear() / (1.0e6)));
+        YearCounter.setCounter((int)lrint(ActiveSimulator->getYear() / (1.0e6)));
         YearCounter.draw();
     }
 
@@ -810,7 +810,7 @@ void InitGraphics(void)
     FindRenderers();
     
     
-    WindowWidth = GetMainDisplayWidth();
+    WindowWidth = 512;//GetMainDisplayWidth();
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);

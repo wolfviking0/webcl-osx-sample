@@ -52,69 +52,49 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
-
-#import "GalaxiesView.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "nbody.h"
 #include <unistd.h>
 #include <inttypes.h>
 
-int main(int argc, const char *argv[])
+#include <GLUT/glut.h>
+
+#define WIDTH                           (512)
+#define HEIGHT                          (512)
+
+static int Width                        = WIDTH;
+static int Height                       = HEIGHT;
+
+int main(int argc, char **argv)
 {
-    ProcessSerialNumber psn;
-    GetCurrentProcess(&psn);
-    TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-    SetFrontProcess(&psn);
-    
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    [NSApplication sharedApplication];
-    
-    chdir([[[NSBundle mainBundle] resourcePath] cStringUsingEncoding:NSUTF8StringEncoding]);
-    
-    [NSBundle loadNibNamed:@"MainMenu.nib" owner:NSApp];
-    
-    NSRect contentRect = [[NSScreen mainScreen] visibleFrame];
-    
-    NSRect frameRect = [NSWindow frameRectForContentRect:contentRect
-                                               styleMask:NSTitledWindowMask];
 
-    NSWindow *window = [[NSWindow alloc]
-        initWithContentRect:frameRect
-                  styleMask:NSTitledWindowMask
-                    backing:NSBackingStoreRetained
-                      defer:NO];
 
-    [window setTitle:@"Galaxies"];
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize (Width, Height);
+    glutInitWindowPosition (100, 100);
+    glutCreateWindow (argv[0]);
 
-    NSOpenGLPixelFormatAttribute attributes[] =
-    {
-        NSOpenGLPFADoubleBuffer,
-        NSOpenGLPFAAccelerated,
-        NSOpenGLPFAAllowOfflineRenderers,   // NOTE: Needed to connect to secondary GPUs
-        NSOpenGLPFADepthSize, 24,
-        0
-    };
-
-    /*
     if (argc > 2) {
         fprintf(stderr, "Usage: Galaxies [num_particles]\n");
         return EXIT_FAILURE;
     } else if (argc == 2) {
-		if(!strstr(argv[1], "-psn_"))
-            SetParticleCount(strtol(argv[1], NULL, 10));
+        if(!strstr(argv[1], "-psn_"))
+            SetParticleCount((int)strtol(argv[1], NULL, 10));
     }
-    */
-    SetParticleCount(4096*2);
     
-    NSOpenGLPixelFormat *pixelFormat =
-        [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
-    GalaxiesView *view = [[GalaxiesView alloc] initWithFrame:contentRect
-                                                 pixelFormat:pixelFormat];
-
-    [window setContentView:view];
-    [window makeKeyAndOrderFront:nil];
     
-    [NSApp run];
-    [pool release];
+    InitDefaults(1, 1.0f, 0, 0, 0, 0, 0);
+    InitGalaxies(0);
+    
+    glutDisplayFunc(DisplayCallback);
+    glutKeyboardFunc(KeyboardCallback);
+    
+    printf("Starting event loop...\n");
+    
+    glutMainLoop();
+    
     return EXIT_SUCCESS;
 }

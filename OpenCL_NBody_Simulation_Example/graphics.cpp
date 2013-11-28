@@ -77,12 +77,13 @@ GLuint CreateTextureWithLabelUseFont(
     unsigned height, 
     int alignment)
 {
+    /*
     id_type view = ConvenienceCreateNSTextView(
                        width, height,
                        font, size,
                        alignment,
                        text.c_str());
-
+    */
     GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -90,11 +91,11 @@ GLuint CreateTextureWithLabelUseFont(
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
+    /*
     TexImageNSView(GL_TEXTURE_2D, view);
 
     ConvenienceReleaseNSTextView(view);
-
+    */
     return texture;
 }
 
@@ -104,6 +105,7 @@ LoadTexture(
     GLenum target, 
     bool mipmap)
 {
+    /*
     CFURLRef url = CFURLCreateFromFileSystemRepresentation(
                        kCFAllocatorDefault,
                        (UInt8 const *)path.c_str(),
@@ -116,9 +118,12 @@ LoadTexture(
 
     size_t width = CGImageGetWidth(image);
     size_t height = CGImageGetHeight(image);
-
+    */
+    printf("\todo graphics.cpp line 121\n");
+    size_t width = 128;
+    size_t height = 128;
     void *data = calloc(width * height, 4);
-
+    /*
     CGColorSpaceRef colorSpace = CGColorSpaceCreateWithName(
                                      kCGColorSpaceGenericRGB);
     CGContextRef context = CGBitmapContextCreate(
@@ -133,7 +138,7 @@ LoadTexture(
 
     CGContextDrawImage(context, CGRectMake(0, 0, width, height), image);
     CFRelease(image);
-
+    */
     GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(target, texture);
@@ -153,14 +158,14 @@ LoadTexture(
         target,
         0,
         GL_RGBA8,
-        width,
-        height,
+        (GLsizei)width,
+        (GLsizei)height,
         0,
         GL_BGRA,
         GL_UNSIGNED_INT_8_8_8_8_REV,
         data);
 
-    CFRelease(context);
+    //CFRelease(context);
     free(data);
 
     return texture;

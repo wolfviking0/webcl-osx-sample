@@ -102,7 +102,7 @@ Simulation::Simulation(size_t nbodies, NBodyParams params) :
     m_update_external_data(true),
     m_body_count(nbodies),
     m_start_index(0),
-    m_end_index(nbodies),
+    m_end_index((int)nbodies),
     m_active_params(params),
     m_data(NULL),
     m_thread(0),
@@ -190,7 +190,7 @@ void Simulation::reset(NBodyParams params)
     pause();
 
     m_start_index = 0;
-    m_end_index = m_body_count;
+    m_end_index = (int)m_body_count;
     m_active_params = params;
     m_gigaflops_meter.reset();
     m_gigaflops = 0;
@@ -347,7 +347,7 @@ void GPUSimulation::step()
     {
         for (i = 0; i < m_device_count; i++)
         {
-            MemCopyDeviceToHost(m_compute_commands[i], m_host_position, m_device_position[m_write_index], sizeof(float4)*m_body_count, 0);
+            MemCopyDeviceToHost(m_compute_commands[i], m_host_position, m_device_position[m_write_index], sizeof(float4)*(int)m_body_count, 0);
             giveData(m_host_position);
         }
     }
@@ -486,7 +486,7 @@ int GPUSimulation::setupComputeDevices()
         if (return_value)
             return -300;
 
-        work_item_x = (work_item_x <= localSize) ? work_item_x : localSize;
+        work_item_x = (work_item_x <= localSize) ? work_item_x : (int)localSize;
     }
 
     if (m_body_count % work_item_x != 0) {
@@ -613,7 +613,7 @@ int GPUSimulation::resetDevice()
 {
     unsigned int i = 0;
     int err = CL_SUCCESS;
-    RandomizeBodiesPackedData(m_active_params.m_config, (float*) m_host_position, (float*) m_host_velocity, (float*) m_host_color, m_active_params.m_cluster_scale, m_active_params.m_velocity_scale, m_body_count);
+    RandomizeBodiesPackedData(m_active_params.m_config, (float*) m_host_position, (float*) m_host_velocity, (float*) m_host_color, m_active_params.m_cluster_scale, m_active_params.m_velocity_scale, (int)m_body_count);
 
     for (i = 0; i < m_device_count; i++)
         err |= clEnqueueWriteBuffer(m_compute_commands[i], m_device_position[m_read_index], CL_TRUE, 0,  sizeof(float4) * m_body_count, m_host_position, 0, 0, 0);
@@ -693,28 +693,28 @@ void GPUSimulation::getSourcePositionData(float *pDest)
 {
     unsigned int i = 0;
     for (i = 0; i < m_device_count; i++)
-        MemCopyDeviceToHost(m_compute_commands[i], (float4*)pDest, m_device_position[m_read_index], m_body_count*4*sizeof(float), 0);
+        MemCopyDeviceToHost(m_compute_commands[i], (float4*)pDest, m_device_position[m_read_index], (int)m_body_count*4*sizeof(float), 0);
 }
 
 void GPUSimulation::setSourcePositionData(float *pSrc)
 {
     unsigned int i = 0;
     for (i = 0; i < m_device_count; i++)
-        MemCopyHostToDevice(m_compute_commands[i], (float4*)pSrc, m_device_position[m_read_index], m_body_count*4*sizeof(float));
+        MemCopyHostToDevice(m_compute_commands[i], (float4*)pSrc, m_device_position[m_read_index], (int)m_body_count*4*sizeof(float));
 }
 
 void GPUSimulation::getSourceVelocityData(float *pDest)
 {
     unsigned int i = 0;
     for (i = 0; i < m_device_count; i++)
-        MemCopyDeviceToHost(m_compute_commands[i], (float4*)pDest, m_device_velocity[m_read_index], m_body_count*4*sizeof(float), 0);
+        MemCopyDeviceToHost(m_compute_commands[i], (float4*)pDest, m_device_velocity[m_read_index], (int)m_body_count*4*sizeof(float), 0);
 }
 
 void GPUSimulation::setSourceVelocityData(float *pSrc)
 {
     unsigned int i = 0;
     for (i = 0; i < m_device_count; i++)
-        MemCopyHostToDevice(m_compute_commands[i], (float4*)pSrc, m_device_velocity[m_read_index], m_body_count*4*sizeof(float));
+        MemCopyHostToDevice(m_compute_commands[i], (float4*)pSrc, m_device_velocity[m_read_index], (int)m_body_count*4*sizeof(float));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1201,7 +1201,7 @@ int CPUSimulation::executeKernel()
 
 int CPUSimulation::resetDevice()
 {
-    RandomizeBodiesSplitData(m_active_params.m_config, m_host_position_x[m_read_index], m_host_position_y[m_read_index], m_host_position_z[m_read_index], m_host_mass, m_host_velocity_x[m_read_index], m_host_velocity_y[m_read_index], m_host_velocity_z[m_read_index], (float *) m_host_color, m_active_params.m_cluster_scale, m_active_params.m_velocity_scale, m_body_count);
+    RandomizeBodiesSplitData(m_active_params.m_config, m_host_position_x[m_read_index], m_host_position_y[m_read_index], m_host_position_z[m_read_index], m_host_mass, m_host_velocity_x[m_read_index], m_host_velocity_y[m_read_index], m_host_velocity_z[m_read_index], (float *) m_host_color, m_active_params.m_cluster_scale, m_active_params.m_velocity_scale, (int)m_body_count);
     for ( unsigned int i = 0; i < m_body_count; i++ )
     {
         ((float *)m_host_position)[4*i+0] = m_host_position_x[m_read_index][i];

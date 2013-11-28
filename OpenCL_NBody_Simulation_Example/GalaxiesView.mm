@@ -132,8 +132,12 @@
     if(init_demo < 0) init_demo = 0;
     if(init_demo > 6) init_demo = 6;
 
-    InitDefaults(init_demo, star_scale, show_hud, show_updates_meter, show_fps_meter, show_gflops_meter, show_dock);
-    InitGalaxies(init_mode);
+    //InitDefaults(init_demo, star_scale, show_hud, show_updates_meter, show_fps_meter, show_gflops_meter, show_dock);
+    //InitGalaxies(init_mode);
+    
+    InitDefaults(1, 1.0f, 0, 0, 0, 0, 0);
+    InitGalaxies(0);
+    
     ResizeCallback([self bounds].size.width, [self bounds].size.height);
     
     [NSTimer scheduledTimerWithTimeInterval:0.0

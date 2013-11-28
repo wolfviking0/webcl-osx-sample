@@ -111,7 +111,7 @@ void Counter::draw()
     float x0 = _x + (_w - w0) / 2.0;
     DrawQuadInverted( x0 + w0 - TEXT_WIDTH + 15, _y, TEXT_WIDTH, _h );
 
-    int n = lrint(floor(_number));
+    int n = (int)lrint(floor(_number));
     int digitCount = 1;
     if (_number >= 1) digitCount += lrint(floor(log10(_number)));
 
