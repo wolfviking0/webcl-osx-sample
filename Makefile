@@ -51,6 +51,7 @@ all: \
 	reduce_sample \
 	noise_sample \
 	qjulia_sample \
+	galaxies_sample \
 
 hello_sample: 
 	$(call chdir,OpenCL_Hello_World_Example/)
@@ -114,6 +115,37 @@ qjulia_sample:
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) qjulia.c -s LEGACY_GL_EMULATION=1 $(MODE) \
 	$(PRELOAD) qjulia_kernel.cl \
 	-o ../build/qjulia.js	
+
+galaxies_sample: 
+	$(call chdir,OpenCL_NBody_Simulation_Example/)
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) \
+	counter.cpp \
+	data.cpp \
+	graphics.cpp \
+	hud.cpp \
+	main.cpp \
+	nbody.cpp \
+	randomize.cpp \
+	simulation.cpp \
+	types.cpp \
+	-s LEGACY_GL_EMULATION=1 $(MODE) \
+	$(PRELOAD) qjulia_kernel.cl \
+	-o ../build/qjulia.js	
+
+galaxies_sample_osx: 
+	$(call chdir,OpenCL_NBody_Simulation_Example/)
+	clang++ -02 \
+	counter.cpp \
+	data.cpp \
+	graphics.cpp \
+	hud.cpp \
+	main.cpp \
+	nbody.cpp \
+	randomize.cpp \
+	simulation.cpp \
+	types.cpp \
+	-I./ -I$(EMCC)/system/include/ -framework OpenCL -framework OpenGL -framework GLUT \
+	-o galaxies.out
 
 clean:
 	$(call chdir,build/)

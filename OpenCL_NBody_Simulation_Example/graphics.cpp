@@ -52,7 +52,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#ifdef __EMSCRIPTEN__
+#include <stdlib.h>
+#include <math.h>
+#include <GL/glew.h>
+#include <GL/gl.h>
+#else
 #include <ApplicationServices/ApplicationServices.h>
+#endif
 
 #include "graphics.h"
 #include "NSViewTexture.h"
@@ -293,6 +300,7 @@ GLuint CreateButtonLabel(
 
 void DrawButton(Button const *button, GLuint texture, GLuint background, bool selected)
 {
+    /*
     glBindTexture(GL_TEXTURE_RECTANGLE_ARB, background);
     glColor3f(1, 1, 1);
     glEnable(GL_TEXTURE_RECTANGLE_ARB);
@@ -336,6 +344,7 @@ void DrawButton(Button const *button, GLuint texture, GLuint background, bool se
     glTranslatef(0, 10, 0);
     glColor3f(1, 1, 1);
     glBindTexture(GL_TEXTURE_2D, 0);
+     */
 }
 
 void DrawMeter(

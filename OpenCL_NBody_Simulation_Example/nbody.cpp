@@ -55,8 +55,19 @@
 #include <algorithm>
 #include <cmath>
 
+#ifdef __EMSCRIPTEN__
+#include <GL/glut.h>
+#include <GL/glew.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glext.h>
+#else
 #include <OpenGL/OpenGL.h>
 #include <OpenGL/glu.h>
+#include <GLUT/glut.h>
+#endif
+
+
 
 #include "graphics.h"
 #include "hud.h"
@@ -251,6 +262,11 @@ void MakeButtons(void)
         BUTTON_SPACING,
         BUTTON_WIDTH,
         BUTTON_HEIGHT);
+}
+
+void IdleCallback(void)
+{
+    glutPostRedisplay();
 }
 
 void ResizeCallback(int x, int y)
@@ -620,14 +636,28 @@ void InitDefaults(
 
 void DrawHeadsUpDisplay(void)
 {
+#ifdef __EMSCRIPTEN__
+    static float lastFrameTime = 0;
+#else
     static uint64_t lastFrameTime = 0;
+#endif
+
     if (lastFrameTime == 0)
     {
+#ifdef __EMSCRIPTEN__
+        lastFrameTime = emscripten_get_now();
+#else
         lastFrameTime = mach_absolute_time();
+#endif
     }
     else
     {
+#ifdef __EMSCRIPTEN__
+        float now = emscripten_get_now();
+#else
         uint64_t now = mach_absolute_time();
+#endif
+        
         double dt = SubtractTime(now, lastFrameTime);
         lastFrameTime = now;
 
@@ -763,7 +793,8 @@ void DisplayCallback(void)
     {
         if (WaitingForData)
         {
-            CGLFlushDrawable(CGLGetCurrentContext());
+            //CGLFlushDrawable(CGLGetCurrentContext());
+            glutSwapBuffers();
         }
         return;
     }
@@ -774,12 +805,13 @@ void DisplayCallback(void)
 
     DrawStars();
     DrawHeadsUpDisplay();
-
-    CGLFlushDrawable(CGLGetCurrentContext());
+    glutSwapBuffers();
+    //CGLFlushDrawable(CGLGetCurrentContext());
 }
 
 void FindRenderers(void)
 {
+    /*
     GLint i = 0;
     GLint count = 0;
     GLint current = 0;
@@ -803,6 +835,7 @@ void FindRenderers(void)
     CGLFlushDrawable(ctx);
     CGLSetVirtualScreen(ctx, current);
     CGLSetParameter(ctx, kCGLCPSwapInterval, &sync);
+    */
 }
 
 void InitGraphics(void)
@@ -810,7 +843,7 @@ void InitGraphics(void)
     FindRenderers();
     
     
-    WindowWidth = 512;//GetMainDisplayWidth();
+    WindowWidth = 1024;//GetMainDisplayWidth();
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
@@ -822,19 +855,19 @@ void InitGraphics(void)
     glEnableClientState(GL_VERTEX_ARRAY);
 
     glGenBuffers(1, &VertexBufferIds[0]);
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, VertexBufferIds[0]);
+    glBindBuffer(GL_ARRAY_BUFFER_ARB, VertexBufferIds[0]);
     glBufferData(GL_ARRAY_BUFFER_ARB, NBodyCount * 4 * sizeof(float), NULL, VBO_USAGE);
     glVertexPointer(4, GL_FLOAT, 0, 0);
     glBindBuffer( GL_ARRAY_BUFFER_ARB, 0);
 
     glGenBuffers(1, &VertexBufferIds[1]);
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, VertexBufferIds[1]);
+    glBindBuffer(GL_ARRAY_BUFFER_ARB, VertexBufferIds[1]);
     glBufferData(GL_ARRAY_BUFFER_ARB, NBodyCount * 4 * sizeof(float), NULL, VBO_USAGE);
     glVertexPointer(4, GL_FLOAT, 0, 0);
     glBindBuffer(GL_ARRAY_BUFFER_ARB, 0);
 
     glGenBuffers(1, &ColorBufferId);
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, ColorBufferId);
+    glBindBuffer(GL_ARRAY_BUFFER_ARB, ColorBufferId);
     glBufferData(GL_ARRAY_BUFFER_ARB, NBodyCount * 4 * sizeof(float), NULL, VBO_USAGE);
     glColorPointer(4, GL_FLOAT, 0, 0);
     glBindBuffer( GL_ARRAY_BUFFER_ARB, 0 );
@@ -878,6 +911,9 @@ void KeyboardCallback(unsigned char key, int x, int y)
 {
     switch (key)
     {
+    case 27:
+        exit(0);
+        break;
     case ' ':
     {
         PauseSimulation = !PauseSimulation;

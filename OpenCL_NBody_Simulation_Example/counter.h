@@ -56,7 +56,12 @@
 #define __COUNTER_H__
 
 #include <cstddef>
+#ifdef __EMSCRIPTEN__
+#include <GL/gl.h>
+#else
 #include <OpenGL/gl.h>
+#endif
+
 
 
 class Counter

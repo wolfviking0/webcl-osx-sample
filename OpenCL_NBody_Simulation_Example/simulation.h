@@ -60,8 +60,12 @@
 #include <pthread.h>
 #include <pthread.h>
 #include <sys/time.h>
-#include <OpenCL/opencl.h>
 
+#ifdef __EMSCRIPTEN__
+#include <CL/opencl.h>
+#else
+#include <OpenCL/opencl.h>
+#endif
 #include "nbody.h"
 #include "types.h"
 #include "data.h"

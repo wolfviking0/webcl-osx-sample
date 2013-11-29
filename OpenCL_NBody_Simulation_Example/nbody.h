@@ -64,6 +64,7 @@ void InitGraphics();
 void SwapSimulationDevices();
 void RelabelButtons(void);
 void DisplayCallback(void);
+void IdleCallback(void);
 void ResizeCallback(int w, int h);
 void MouseClickCallback(int button, int state, int x, int y);
 void MouseMovementCallback(int x, int y);

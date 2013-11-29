@@ -59,10 +59,14 @@
 #include <unistd.h>
 #include <inttypes.h>
 
+#ifdef __EMSCRIPTEN__
+#include <GL/glut.h>
+#else
 #include <GLUT/glut.h>
+#endif
 
-#define WIDTH                           (512)
-#define HEIGHT                          (512)
+#define WIDTH                           (1024)
+#define HEIGHT                          (1024)
 
 static int Width                        = WIDTH;
 static int Height                       = HEIGHT;
@@ -89,6 +93,10 @@ int main(int argc, char **argv)
     InitDefaults(1, 1.0f, 0, 0, 0, 0, 0);
     InitGalaxies(0);
     
+    ResizeCallback(Width,Height);
+
+    glutIdleFunc(IdleCallback);
+    glutReshapeFunc(ResizeCallback);
     glutDisplayFunc(DisplayCallback);
     glutKeyboardFunc(KeyboardCallback);
     

@@ -55,8 +55,11 @@
 #ifndef __TIMING_H__
 #define __TIMING_H__
 
-#include <mach/mach_time.h>
 #include <unistd.h>
+
+#ifndef __EMSCRIPTEN__
+
+#include <mach/mach_time.h>
 
 static inline double SubtractTime( uint64_t end, uint64_t start )
 {
@@ -72,5 +75,16 @@ static inline double SubtractTime( uint64_t end, uint64_t start )
 
     return conversion * (double) difference;
 }
+
+#else
+
+#include <emscripten/emscripten.h>
+
+static inline float SubtractTime( float uiEndTime, float uiStartTime )
+{
+    return 0.001f * (uiEndTime - uiStartTime);
+}
+
+#endif
 
 #endif

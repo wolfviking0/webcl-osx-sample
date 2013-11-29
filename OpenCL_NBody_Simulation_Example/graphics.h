@@ -58,7 +58,11 @@
 #include "hud.h"
 #include "constants.h"
 #include "NSViewTexture.h"
+#ifdef __EMSCRIPTEN__
+#include <GL/gl.h>
+#else
 #include <OpenGL/gl.h>
+#endif
 #include <string>
 
 GLuint CreateTextureWithLabel(

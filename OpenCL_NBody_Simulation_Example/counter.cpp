@@ -54,7 +54,11 @@
 
 #include <cstdlib>
 #include <cmath>
-#include <OpenGL/gl.h>
+#ifdef __EMSCRIPTEN__
+#include <GL/gl.h>
+#else
+#include <OpenGL/OpenGL.h>
+#endif
 #include "graphics.h"
 #include "counter.h"
 

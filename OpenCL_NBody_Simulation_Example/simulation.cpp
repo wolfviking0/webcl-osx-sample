@@ -259,9 +259,15 @@ void Simulation::run()
         uint64_t before, after;
         CL(
         {
+#ifdef __EMSCRIPTEN__
+            before = emscripten_get_now();
+            step();
+            after = emscripten_get_now();            
+#else
             before = mach_absolute_time();
             step();
             after = mach_absolute_time();
+#endif
         });
         pthread_mutex_unlock(&m_run_lock);
 

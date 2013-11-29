@@ -57,9 +57,12 @@
 #include <cstdlib>
 #include <map>
 
+#ifdef __EMSCRIPTEN__
+#include <GL/gl.h>
+#else
 #include <OpenGL/gl.h>
 #include <ApplicationServices/ApplicationServices.h>
-
+#endif
 #include "graphics.h"
 #include "hud.h"
 
@@ -146,9 +149,9 @@ GLuint value_texture_for(const T &t)
     return texture;
 }
 
-static void drawMarks(CGContextRef gc, int width, int height, int max)
-{
-    printf("\todo hud.cpp line 150\n");
+//static void drawMarks(CGContextRef gc, int width, int height, int max)
+//{
+    //printf("\todo hud.cpp line 150\n");
     /*
     float   angle, c, s, tick, radius, needle;
     float   r0, r1, r2, r3, cx, cy;
@@ -248,7 +251,7 @@ static void drawMarks(CGContextRef gc, int width, int height, int max)
                                  text, strlen(text));
     }
     */
-}
+//}
 
 static void initBackground(unsigned w, unsigned h, unsigned max)
 {
