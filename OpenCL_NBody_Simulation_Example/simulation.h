@@ -58,7 +58,6 @@
 #include <cstddef>
 #include <cstdlib>
 #include <pthread.h>
-#include <pthread.h>
 #include <sys/time.h>
 
 #ifdef __EMSCRIPTEN__

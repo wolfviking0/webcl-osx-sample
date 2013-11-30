@@ -128,9 +128,9 @@ galaxies_sample:
 	randomize.cpp \
 	simulation.cpp \
 	types.cpp \
+	-D__JAVASCRIPT__ \
 	-s LEGACY_GL_EMULATION=1 $(MODE) \
-	$(PRELOAD) qjulia_kernel.cl \
-	-o ../build/qjulia.js	
+	-o ../build/galaxies.js	
 
 galaxies_sample_osx: 
 	$(call chdir,OpenCL_NBody_Simulation_Example/)

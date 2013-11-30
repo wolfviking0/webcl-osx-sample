@@ -57,7 +57,16 @@
 
 #include <unistd.h>
 
-#ifndef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
+
+#include <emscripten/emscripten.h>
+
+static inline float SubtractTime( float uiEndTime, float uiStartTime )
+{
+    return 0.001f * (uiEndTime - uiStartTime);
+}
+
+#else
 
 #include <mach/mach_time.h>
 
@@ -72,17 +81,8 @@ static inline double SubtractTime( uint64_t end, uint64_t start )
         if ( err == 0  )
             conversion = 1e-9 * (double) timebase.numer / (double) timebase.denom;
     }
-
+    
     return conversion * (double) difference;
-}
-
-#else
-
-#include <emscripten/emscripten.h>
-
-static inline float SubtractTime( float uiEndTime, float uiStartTime )
-{
-    return 0.001f * (uiEndTime - uiStartTime);
 }
 
 #endif

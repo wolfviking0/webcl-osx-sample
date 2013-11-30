@@ -56,10 +56,10 @@
 #include <cmath>
 
 #ifdef __EMSCRIPTEN__
-#include <GL/glut.h>
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <GL/glut.h>
 #include <GL/glext.h>
 #else
 #include <OpenGL/OpenGL.h>
@@ -385,10 +385,11 @@ void SelectRenderer(unsigned int index)
         index = 0;
         
     GLint sync = 1;
+    /*
     CGLContextObj ctx = CGLGetCurrentContext();
     CGLSetVirtualScreen(ctx, RendererButtons[index].renderer);
     CGLSetParameter(ctx, kCGLCPSwapInterval, &sync);
-
+    */
     RendererIndex = index;
     
     printf("Using %s renderer...\n", RendererButtons[index].name);
@@ -636,7 +637,7 @@ void InitDefaults(
 
 void DrawHeadsUpDisplay(void)
 {
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     static float lastFrameTime = 0;
 #else
     static uint64_t lastFrameTime = 0;
@@ -644,7 +645,7 @@ void DrawHeadsUpDisplay(void)
 
     if (lastFrameTime == 0)
     {
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
         lastFrameTime = emscripten_get_now();
 #else
         lastFrameTime = mach_absolute_time();
@@ -652,7 +653,7 @@ void DrawHeadsUpDisplay(void)
     }
     else
     {
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
         float now = emscripten_get_now();
 #else
         uint64_t now = mach_absolute_time();
@@ -903,8 +904,8 @@ void InitGraphics(void)
 
     glUseProgram(0);
 
-    const GLint sync = 1;
-    CGLSetParameter(CGLGetCurrentContext(), kCGLCPSwapInterval, &sync);
+    //const GLint sync = 1;
+    //CGLSetParameter(CGLGetCurrentContext(), kCGLCPSwapInterval, &sync);
 }
 
 void KeyboardCallback(unsigned char key, int x, int y)

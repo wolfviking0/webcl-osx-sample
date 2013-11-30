@@ -57,7 +57,9 @@
 #include <cstdio>
 #include <cstring>
 
+#ifndef __EMSCRIPTEN__
 #include <libkern/OSAtomic.h>
+#endif
 #include <math.h>
 
 #include "simulation.h"
@@ -129,6 +131,22 @@ bool Simulation::isInitialized()
     return m_initialized;
 }
 
+int AtomicCAS(void * volatile *ptr,void* old_value,void* new_value) {
+//#if defined(__APPLE__)
+//    return OSAtomicCompareAndSwapPtrBarrier(old_value,new_value,ptr);
+//#else
+    if(*ptr == old_value)
+    {
+        *ptr = new_value;
+        return true;
+    }
+    else
+        return false;
+    
+    return 0;
+//#endif
+}
+
 void *Simulation::takeData()
 {
     void *oldData;
@@ -136,7 +154,8 @@ void *Simulation::takeData()
     {
         oldData = m_data;
     }
-    while (!OSAtomicCompareAndSwapPtrBarrier(oldData, NULL, &m_data));
+    //while (!OSAtomicCompareAndSwapPtrBarrier(oldData, NULL, &m_data));
+    while (!AtomicCAS(&m_data, oldData, NULL));
     return oldData;
 }
 
@@ -220,6 +239,8 @@ double Simulation::getUpdatesPerSecond() const
 
 void Simulation::giveData(void *data)
 {
+    
+    
     void *copy = malloc(sizeof(float4) * m_body_count);
     memcpy(copy, data, sizeof(float4) * m_body_count);
 
@@ -228,8 +249,11 @@ void Simulation::giveData(void *data)
     {
         oldData = m_data;
     }
-    while (!OSAtomicCompareAndSwapPtrBarrier(oldData, copy, &m_data));
+    //while (!OSAtomicCompareAndSwapPtrBarrier(oldData, copy, &m_data));
+    while (!AtomicCAS(&m_data, oldData, copy));
+    
     free(oldData);
+    
 }
 
 static pthread_mutex_t cl_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -259,7 +283,7 @@ void Simulation::run()
         uint64_t before, after;
         CL(
         {
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(FORCE_EMSCRIPTEN)
             before = emscripten_get_now();
             step();
             after = emscripten_get_now();            
