@@ -59,6 +59,8 @@
 
 #ifndef __EMSCRIPTEN__
 #include <libkern/OSAtomic.h>
+#else
+#include <emscripten/emscripten.h>
 #endif
 #include <math.h>
 
@@ -99,6 +101,11 @@ void *simulate(void *arg)
     return NULL;
 }
 
+void simulateemscripten(void *arg)
+{
+    //((Simulation *)arg)->run();
+}
+
 Simulation::Simulation(size_t nbodies, NBodyParams params) :
     m_initialized(false),
     m_update_external_data(true),
@@ -107,7 +114,7 @@ Simulation::Simulation(size_t nbodies, NBodyParams params) :
     m_end_index((int)nbodies),
     m_active_params(params),
     m_data(NULL),
-    m_thread(0),
+    //m_thread(0),
     m_run_mode(STOP),
     m_stop(false),
     m_reload(false),
@@ -161,10 +168,14 @@ void *Simulation::takeData()
 
 void Simulation::start(bool paused)
 {
-    pthread_mutex_init(&m_run_lock, NULL);
+    //pthread_mutex_init(&m_run_lock, NULL);
     pause();
-    pthread_create(&m_thread, NULL, simulate, this);
-
+    //pthread_create(&m_thread, NULL, simulate, this);
+    
+    initialize();
+    
+    //emscripten_async_call(simulateemscripten,this,-1);
+    
     if(!paused)
         unpause();
 }
@@ -177,7 +188,7 @@ void Simulation::pause()
     }
     else
     {
-        pthread_mutex_lock(&m_run_lock);
+        //pthread_mutex_lock(&m_run_lock);
         m_paused = true;
     }
 }
@@ -191,7 +202,7 @@ void Simulation::unpause()
     else
     {
         m_paused = false;
-        pthread_mutex_unlock(&m_run_lock);
+        //pthread_mutex_unlock(&m_run_lock);
     }
 }
 
@@ -200,7 +211,7 @@ void Simulation::stop()
     pause();
     m_stop = true;
     unpause();
-    pthread_join(m_thread, NULL);
+    //pthread_join(m_thread, NULL);
     m_initialized = false;
 }
 
@@ -256,23 +267,27 @@ void Simulation::giveData(void *data)
     
 }
 
-static pthread_mutex_t cl_lock = PTHREAD_MUTEX_INITIALIZER;
+//static pthread_mutex_t cl_lock = PTHREAD_MUTEX_INITIALIZER;
 
+/*
 #define CL(...)                    \
     pthread_mutex_lock(&cl_lock);  \
     __VA_ARGS__                    \
     pthread_mutex_unlock(&cl_lock)
+*/
+
+#define CL(...) __VA_ARGS__
 
 void Simulation::run()
 {
-    CL( { initialize(); });
-    while (true)
+    //CL( { initialize(); });
+    //while (true)
     {
-        pthread_mutex_lock(&m_run_lock);
+        //pthread_mutex_lock(&m_run_lock);
         if (m_stop)
         {
-            pthread_mutex_unlock(&m_run_lock);
-            break;
+            //pthread_mutex_unlock(&m_run_lock);
+            //break;
         }
         if (m_reload)
         {
@@ -293,7 +308,7 @@ void Simulation::run()
             after = mach_absolute_time();
 #endif
         });
-        pthread_mutex_unlock(&m_run_lock);
+        //pthread_mutex_unlock(&m_run_lock);
 
         double dt = SubtractTime(after, before);
 
@@ -307,7 +322,7 @@ void Simulation::run()
         m_year += 1.8e6 * m_active_params.m_timestep / 0.1 ; // normalize for CCN_TIME_SCALE at 0.4
     }
 
-    CL( { terminate(); });
+    //CL( { terminate(); });
 }
 
 double Simulation::getYear() const

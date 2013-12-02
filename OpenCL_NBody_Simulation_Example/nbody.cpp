@@ -266,6 +266,8 @@ void MakeButtons(void)
 
 void IdleCallback(void)
 {
+    ActiveSimulator->run();
+    
     glutPostRedisplay();
 }
 

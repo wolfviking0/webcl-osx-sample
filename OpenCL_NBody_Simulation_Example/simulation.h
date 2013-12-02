@@ -107,7 +107,7 @@ public:
     virtual void getPartialPositionData(float*) = 0;
 
     virtual const char* getDeviceName() const    { return m_device_name;    }
-
+    void run();
 public:
 
     void start(bool paused=true);
@@ -138,7 +138,7 @@ public:
 
 private:
 
-    void run();
+
     friend void *simulate(void *arg);
 
 protected:
@@ -166,8 +166,8 @@ private:
 
     void * volatile     m_data;
 
-    pthread_t           m_thread;
-    pthread_mutex_t     m_run_lock;
+    //pthread_t           m_thread;
+    //pthread_mutex_t     m_run_lock;
 
     RunMode m_run_mode;
     bool                m_stop;
