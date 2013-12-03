@@ -502,12 +502,12 @@ void DrawStars(void)
 
     glUseProgram(GalaxiesShader);
 
-    glActiveTextureARB(GL_TEXTURE0_ARB);
+    glActiveTexture(GL_TEXTURE0_ARB);
 
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, VertexBufferIds[OutputVertexBufferId]);
+    glBindBuffer(GL_ARRAY_BUFFER_ARB, VertexBufferIds[OutputVertexBufferId]);
     glBufferSubData(GL_ARRAY_BUFFER_ARB, 0, NBodyCount * 4 * sizeof(float), HostPositionData);
     glVertexPointer(4, GL_FLOAT, 0, 0);
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+    glBindBuffer(GL_ARRAY_BUFFER_ARB, 0);
 
     glPushMatrix();
 
@@ -532,11 +532,11 @@ void DrawStars(void)
     {
         static int init = 0;
         {
-            glBindBufferARB(GL_ARRAY_BUFFER_ARB, ColorBufferId);
+            glBindBuffer(GL_ARRAY_BUFFER_ARB, ColorBufferId);
             // This should only be done once -- colors don't change
             glBufferSubData(GL_ARRAY_BUFFER_ARB, 0, NBodyCount * 4 * sizeof(float), HostColorData);
             glColorPointer(4, GL_FLOAT, 0, 0);
-            glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+            glBindBuffer(GL_ARRAY_BUFFER_ARB, 0);
             init = 1;
         }
         glEnableClientState(GL_COLOR_ARRAY);
@@ -882,7 +882,7 @@ void InitGraphics(void)
         unsigned char* texData = CreateGaussianMap(texRes);
         glGenTextures(1, &tex2);
         glBindTexture(GL_TEXTURE_2D, tex2);
-        glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+        //glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE8, texRes, texRes, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, texData);

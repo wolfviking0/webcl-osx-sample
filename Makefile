@@ -129,8 +129,19 @@ galaxies_sample:
 	simulation.cpp \
 	types.cpp \
 	-D__JAVASCRIPT__ \
+	-s TOTAL_MEMORY=1024*1024*100 \
 	-s LEGACY_GL_EMULATION=1 $(MODE) \
-	-o ../build/osx_galaxies.js	
+	--preload-file nbody.fsh \
+	--preload-file nbody.vsh \
+	--preload-file star.png \
+	--preload-file nbody_gpu.cl \
+	--preload-file nbody_cpu.cl \
+	--preload-file bodies_16k.dat \
+	--preload-file bodies_24k.dat \
+	--preload-file bodies_32k.dat \
+	--preload-file bodies_64k.dat \
+	--preload-file bodies_80k.dat \
+	-o ../build/osx_galaxies.js
 
 galaxies_sample_osx: 
 	$(call chdir,OpenCL_NBody_Simulation_Example/)

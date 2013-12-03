@@ -96,8 +96,8 @@ GLuint CreateTextureWithLabelUseFont(
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     /*
     TexImageNSView(GL_TEXTURE_2D, view);
 
@@ -146,8 +146,10 @@ LoadTexture(
     CGContextDrawImage(context, CGRectMake(0, 0, width, height), image);
     CFRelease(image);
     */
+    
     GLuint texture;
     glGenTextures(1, &texture);
+    /*
     glBindTexture(target, texture);
     if (mipmap)
     {
@@ -164,14 +166,14 @@ LoadTexture(
     glTexImage2D(
         target,
         0,
-        GL_RGBA8,
+        GL_RGBA,
         (GLsizei)width,
         (GLsizei)height,
         0,
-        GL_BGRA,
-        GL_UNSIGNED_INT_8_8_8_8_REV,
+        GL_RGBA,
+        GL_UNSIGNED_INT,
         data);
-
+*/
     //CFRelease(context);
     free(data);
 

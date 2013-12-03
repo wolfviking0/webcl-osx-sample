@@ -6,3 +6,4 @@ void main()
     gl_PointSize = 0.05 * pointSize;
     gl_FrontColor = gl_Color;
 }
+
