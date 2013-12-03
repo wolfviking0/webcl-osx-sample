@@ -526,7 +526,7 @@ void DrawStars(void)
 
     glUniform1f(PointSize, StarSize * (float)DemoParams[ActiveDemo].m_point_size);
 
-    glBindTexture(GL_TEXTURE_2D, tex);
+    //glBindTexture(GL_TEXTURE_2D, tex);
 
     if (ActiveDemo == 0)
     {
@@ -545,6 +545,7 @@ void DrawStars(void)
     }
     else
     {
+        
         // white stars
         glColor3f(0.8, 0.8, 0.8);
         glDrawArrays(GL_POINTS, 0, NBodyCount / 4*2);
@@ -558,19 +559,22 @@ void DrawStars(void)
         //glColor3f(1.0, 0.9, 0.9);
         glColor3f(1.0, 0.6, 0.6);
         glDrawArrays(GL_POINTS, NBodyCount / 4*3, NBodyCount / 4*1);
+        
     }
 
     glDisableClientState(GL_COLOR_ARRAY);
 
     if (ActiveDemo == 0)
     {
+        /*
 #if (NBodyCount == 16384)
         glUniform1f(PointSize, 32.0f);
         glColor3f(0.2f, 0.3f, 1.0f);
         glDrawArrays(GL_POINTS, 217, 1);
 #endif
+        */
     }
-
+/*
     glBindTexture(GL_TEXTURE_2D, tex2);
 
     if (ActiveDemo != 0)
@@ -604,6 +608,7 @@ void DrawStars(void)
             glDrawArrays( GL_POINTS, i, 1 );
         }
     }
+    */
 
     glPopMatrix();
 
