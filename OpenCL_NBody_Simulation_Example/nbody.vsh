@@ -4,6 +4,6 @@ void main()
 {
     gl_Position = gl_Vertex;
     gl_PointSize = 0.05 * pointSize;
-    gl_FrontColor = gl_Color;
+    //gl_FrontColor = gl_Color;
 }
 
