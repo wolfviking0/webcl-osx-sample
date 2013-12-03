@@ -79,37 +79,25 @@
             }
             
             loadModule(PARAM);
+
+            var samples = [
+              "osx_hello.js",
+              "osx_transpose.js",
+              "osx_histogram.js",
+              "osx_trajectories.js",
+              "osx_scan.js",
+              "osx_reduce.js",
+              "osx_noise.js",
+              "osx_qjulia.js",
+              "osx_galaxies.js",
+            ];
+
+            if (SAMPLE >= samples.length) {
+              SAMPLE = 0;
+            }
             
-			      switch(SAMPLE) {
-        		case '0':
-          			includeJS("hello.js");     
-          			break;//------------
-            case '1':
-                includeJS("transpose.js");     
-                break;//------------
-            case '2':
-                includeJS("histogram.js");     
-                break;//------------                
-            case '3':
-                includeJS("trajectories.js");     
-                break;//------------                
-            case '4':
-                includeJS("scan.js");     
-                break;//------------
-            case '5':
-                includeJS("reduce.js");     
-                break;//------------
-            case '6':
-                includeJS("noise.js");     
-                break;//------------
-            case '7':
-                includeJS("qjulia.js");     
-                break;//------------                
-       			default:
-          			includeJS("hello.js"); 
-          			break;
-      		}
-        
+            includeJS(samples[SAMPLE]);
+
         	</script>
         </section>
 

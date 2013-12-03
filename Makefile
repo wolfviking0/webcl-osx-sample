@@ -56,20 +56,20 @@ all: \
 hello_sample: 
 	$(call chdir,OpenCL_Hello_World_Example/)
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) hello.c $(MODE) \
-	-o ../build/hello.js
+	-o ../build/osx_hello.js
 	
 transpose_sample: 
 	$(call chdir,OpenCL_Matrix_Transpose_Example/)
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) transpose.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
 	$(PRELOAD) transpose_kernel.cl \
-	-o ../build/transpose.js
+	-o ../build/osx_transpose.js
 
 histogram_sample: 
 	$(call chdir,gpu_histogram/)
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) gpu_histogram.c $(MODE) -s TOTAL_MEMORY=1024*1024*100 \
 	$(PRELOAD) gpu_histogram_buffer.cl \
 	$(PRELOAD) gpu_histogram_image.cl \
-	-o ../build/histogram.js
+	-o ../build/osx_histogram.js
 
 trajectories_sample: 
 	$(call chdir,Trajectories/)
@@ -85,13 +85,13 @@ trajectories_sample:
 	-I./Sources/OpenCL/Headers/ \
 	$(MODE) \
 	$(PRELOAD) Sources/Kernel/TrajectoriesKernel.cl \
-	-o ../build/trajectories.js
+	-o ../build/osx_trajectories.js
 
 scan_sample: 
 	$(call chdir,OpenCL_Parallel_Prefix_Sum_Example/)
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) scan.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
 	$(PRELOAD) TrajectoriesKernel.cl \
-	-o ../build/scan.js
+	-o ../build/osx_scan.js
 
 reduce_sample: 
 	$(call chdir,OpenCL_Parallel_Reduction_Example/)
@@ -102,19 +102,19 @@ reduce_sample:
 	$(PRELOAD) reduce_int_kernel.cl \
 	$(PRELOAD) reduce_int2_kernel.cl \
 	$(PRELOAD) reduce_int4_kernel.cl \
-	-o ../build/reduce.js
+	-o ../build/osx_reduce.js
 
 noise_sample: 
 	$(call chdir,OpenCL_Procedural_Noise_Example/)
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) noise.c -s LEGACY_GL_EMULATION=1 $(MODE) \
 	$(PRELOAD) noise_kernel.cl \
-	-o ../build/noise.js
+	-o ../build/osx_noise.js
 
 qjulia_sample: 
 	$(call chdir,OpenCL_RayTraced_Quaternion_Julia-Set_Example/)
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) qjulia.c -s LEGACY_GL_EMULATION=1 $(MODE) \
 	$(PRELOAD) qjulia_kernel.cl \
-	-o ../build/qjulia.js	
+	-o ../build/osx_qjulia.js	
 
 galaxies_sample: 
 	$(call chdir,OpenCL_NBody_Simulation_Example/)
@@ -130,7 +130,7 @@ galaxies_sample:
 	types.cpp \
 	-D__JAVASCRIPT__ \
 	-s LEGACY_GL_EMULATION=1 $(MODE) \
-	-o ../build/galaxies.js	
+	-o ../build/osx_galaxies.js	
 
 galaxies_sample_osx: 
 	$(call chdir,OpenCL_NBody_Simulation_Example/)
