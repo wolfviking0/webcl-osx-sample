@@ -500,15 +500,16 @@ void DrawStars(void)
     glBlendFunc(GL_ONE, GL_ONE);
     glEnable(GL_BLEND);
 
-    glUseProgram(GalaxiesShader);
+    //glUseProgram(GalaxiesShader);
 
-    glActiveTexture(GL_TEXTURE0_ARB);
+    //glActiveTexture(GL_TEXTURE0_ARB);
 
+    
     glBindBuffer(GL_ARRAY_BUFFER_ARB, VertexBufferIds[OutputVertexBufferId]);
     glBufferSubData(GL_ARRAY_BUFFER_ARB, 0, NBodyCount * 4 * sizeof(float), HostPositionData);
-    glVertexPointer(4, GL_FLOAT, 0, 0);
-    glBindBuffer(GL_ARRAY_BUFFER_ARB, 0);
-
+    //glVertexPointer(4, GL_FLOAT, 0, 0);
+    //glBindBuffer(GL_ARRAY_BUFFER_ARB, 0);
+    
     glPushMatrix();
 
     if (!Resetting)
@@ -524,7 +525,7 @@ void DrawStars(void)
         glRotatef(RotateX, 0, 1, 0);
     }
 
-    glUniform1f(PointSize, StarSize * (float)DemoParams[ActiveDemo].m_point_size);
+    //glUniform1f(PointSize, StarSize * (float)DemoParams[ActiveDemo].m_point_size);
 
     //glBindTexture(GL_TEXTURE_2D, tex);
 
@@ -563,7 +564,7 @@ void DrawStars(void)
     }
 
     glDisableClientState(GL_COLOR_ARRAY);
-
+    
     if (ActiveDemo == 0)
     {
         /*
@@ -851,7 +852,7 @@ void InitGraphics(void)
     FindRenderers();
     
     
-    WindowWidth = 1024;//GetMainDisplayWidth();
+    WindowWidth = 512;//GetMainDisplayWidth();
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
@@ -893,7 +894,7 @@ void InitGraphics(void)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE8, texRes, texRes, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, texData);
         delete texData;
     }
-
+    /*
     glGenTextures(1, &ButtonBackgroundTexture);
     glBindTexture(GL_TEXTURE_RECTANGLE_ARB, ButtonBackgroundTexture);
     InitButton(BUTTON_WIDTH, BUTTON_HEIGHT);
@@ -910,7 +911,7 @@ void InitGraphics(void)
     PointSize = glGetUniformLocation(GalaxiesShader, "pointSize");
 
     glUseProgram(0);
-
+    */
     //const GLint sync = 1;
     //CGLSetParameter(CGLGetCurrentContext(), kCGLCPSwapInterval, &sync);
 }

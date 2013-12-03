@@ -65,8 +65,8 @@
 #include <GLUT/glut.h>
 #endif
 
-#define WIDTH                           (1024)
-#define HEIGHT                          (1024)
+#define WIDTH                           (512)
+#define HEIGHT                          (512)
 
 static int Width                        = WIDTH;
 static int Height                       = HEIGHT;

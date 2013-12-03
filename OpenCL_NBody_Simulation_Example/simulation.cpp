@@ -82,7 +82,7 @@ static int MemCopyDeviceToHost(
     int size, 
     int offset)
 {
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     return clEnqueueReadBuffer(compute_commands, device_data, CL_TRUE, offset, size, host_data, 0, 0, 0);
@@ -94,7 +94,7 @@ static int MemCopyHostToDevice(
     cl_mem device_data, 
     int size)
 {
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     return clEnqueueWriteBuffer(compute_commands, device_data, CL_TRUE, 0, size, host_data, 0, 0, 0);
@@ -546,35 +546,35 @@ int GPUSimulation::setupComputeDevices()
         return -20;
     }
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_position[0] = clCreateBuffer(m_compute_context, stream_flags, sizeof(float4) * m_body_count, NULL, &return_value);
     if (!m_device_position[0])
         return -9;
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_position[1] = clCreateBuffer(m_compute_context, stream_flags, sizeof(float4) * m_body_count, NULL, &return_value);
     if (!m_device_position[1])
         return -11;
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_velocity[0] = clCreateBuffer(m_compute_context, CL_MEM_READ_WRITE, sizeof(float4) * m_body_count, NULL, &return_value);
     if (!m_device_velocity[0])
         return -10;
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_velocity[1] = clCreateBuffer(m_compute_context, CL_MEM_READ_WRITE, sizeof(float4) * m_body_count, NULL, &return_value);
     if (!m_device_velocity[1])
         return -12;
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_SIGNED_INT32);
 #endif
     m_body_range_params = clCreateBuffer(m_compute_context, CL_MEM_READ_WRITE, sizeof(int) * 3, NULL, &return_value);
@@ -683,7 +683,7 @@ int GPUSimulation::resetDevice()
     RandomizeBodiesPackedData(m_active_params.m_config, (float*) m_host_position, (float*) m_host_velocity, (float*) m_host_color, m_active_params.m_cluster_scale, m_active_params.m_velocity_scale, (int)m_body_count);
 
     for (i = 0; i < m_device_count; i++) {
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
         CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
         err |= clEnqueueWriteBuffer(m_compute_commands[i], m_device_position[m_read_index], CL_TRUE, 0,  sizeof(float4) * m_body_count, m_host_position, 0, 0, 0);
@@ -692,7 +692,7 @@ int GPUSimulation::resetDevice()
         return -1;
 
     for (i = 0; i < m_device_count; i++) {
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
         CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
         err |= clEnqueueWriteBuffer(m_compute_commands[i], m_device_velocity[m_read_index], CL_TRUE, 0,  sizeof(float4) * m_body_count, m_host_velocity, 0, 0, 0);
@@ -1068,96 +1068,96 @@ int CPUSimulation::setupComputeDevices(bool vectorized, bool threaded)
     if (!m_compute_kernel)
         return -8;
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_position_x[0] = clCreateBuffer(m_compute_context, (cl_mem_flags)(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR), sizeof(float) * m_body_count, m_host_position_x[0], &return_value);
     if (!m_device_position_x[0])
         return -9;
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_position_x[1] = clCreateBuffer(m_compute_context, (cl_mem_flags)(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR), sizeof(float) *  m_body_count, m_host_position_x[1], &return_value);
     if (!m_device_position_x[1])
         return -10;
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_position_y[0] = clCreateBuffer(m_compute_context, (cl_mem_flags)(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR), sizeof(float) * m_body_count, m_host_position_y[0], &return_value);
     if (!m_device_position_y[0])
         return -11;
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_position_y[1] = clCreateBuffer(m_compute_context, (cl_mem_flags)(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR), sizeof(float) * m_body_count, m_host_position_y[1], &return_value);
     if (!m_device_position_y[1])
         return -12;
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_position_z[0] = clCreateBuffer(m_compute_context, (cl_mem_flags)(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR), sizeof(float) * m_body_count, m_host_position_z[0], &return_value);
     if (!m_device_position_z[0])
         return -13;
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_position_z[1] = clCreateBuffer(m_compute_context, (cl_mem_flags)(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR), sizeof(float) * m_body_count, m_host_position_z[1], &return_value);
     if (!m_device_position_z[1])
         return -14;
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_mass = clCreateBuffer(m_compute_context, (cl_mem_flags)(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR), sizeof(float) * m_body_count, m_host_mass, &return_value);
     if (!m_device_mass)
         return -15;
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_velocity_x[0] = clCreateBuffer(m_compute_context, (cl_mem_flags)(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR), sizeof(float) * m_body_count, m_host_velocity_x[0], &return_value);
     if (!m_device_velocity_x[0])
         return -16;
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_velocity_x[1] = clCreateBuffer(m_compute_context, (cl_mem_flags)(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR), sizeof(float) * m_body_count, m_host_velocity_x[1], &return_value);
     if (!m_device_velocity_x[1])
         return -17;
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_velocity_y[0] = clCreateBuffer(m_compute_context, (cl_mem_flags)(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR), sizeof(float) * m_body_count, m_host_velocity_y[0], &return_value);
     if (!m_device_velocity_y[0])
         return -18;
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_velocity_y[1] = clCreateBuffer(m_compute_context, (cl_mem_flags)(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR), sizeof(float) * m_body_count, m_host_velocity_y[1], &return_value);
     if (!m_device_velocity_y[1])
         return -19;
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_velocity_z[0] = clCreateBuffer(m_compute_context, (cl_mem_flags)(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR), sizeof(float) * m_body_count, m_host_velocity_z[0], &return_value);
     if (!m_device_velocity_z[0])
         return -20;
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_velocity_z[1] = clCreateBuffer(m_compute_context, (cl_mem_flags)(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR), sizeof(float) * m_body_count, m_host_velocity_z[1], &return_value);
     if (!m_device_velocity_z[1])
         return -21;
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
     CL_SET_TYPE_POINTER(CL_FLOAT);
 #endif
     m_device_position = clCreateBuffer(m_compute_context, (cl_mem_flags)(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR), sizeof(float4) * m_body_count, m_host_position, &return_value);
