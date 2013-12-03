@@ -276,7 +276,7 @@ void Simulation::giveData(void *data)
     pthread_mutex_unlock(&cl_lock)
 */
 
-#define CL(...) __VA_ARGS__
+//#define CL(...) __VA_ARGS__
 
 void Simulation::run()
 {
@@ -291,14 +291,14 @@ void Simulation::run()
         }
         if (m_reload)
         {
-            CL( { reset(); });
+            /*CL( */{ reset(); }/*);*/
             m_reload = false;
         }
 
         uint64_t before, after;
-        CL(
+        /*CL(*/
         {
-#if defined(__EMSCRIPTEN__) && defined(FORCE_EMSCRIPTEN)
+#if defined(__EMSCRIPTEN__) && defined(__JAVASCRIPT__)
             before = emscripten_get_now();
             step();
             after = emscripten_get_now();            
@@ -307,7 +307,7 @@ void Simulation::run()
             step();
             after = mach_absolute_time();
 #endif
-        });
+        }/*)*/;
         //pthread_mutex_unlock(&m_run_lock);
 
         double dt = SubtractTime(after, before);

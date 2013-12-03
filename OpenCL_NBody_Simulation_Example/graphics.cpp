@@ -219,7 +219,7 @@ GLuint LoadShader(
 
     if (gsFileName)
     {
-        geometryShader = CreateShader(GL_GEOMETRY_SHADER_EXT, gsFileName);
+        //geometryShader = CreateShader(GL_GEOMETRY_SHADER_EXT, gsFileName);
     }
 
     if (fsFileName)
@@ -229,20 +229,20 @@ GLuint LoadShader(
 
     GLuint program = glCreateProgram();
     if (vertexShader)   glAttachShader(program, vertexShader);
-    if (geometryShader) glAttachShader(program, geometryShader);
+    //if (geometryShader) glAttachShader(program, geometryShader);
     if (fragmentShader) glAttachShader(program, fragmentShader);
-
+/*
     if (geometryShader)
     {
         glProgramParameteriEXT(program, GL_GEOMETRY_INPUT_TYPE_EXT, inType);
         glProgramParameteriEXT(program, GL_GEOMETRY_OUTPUT_TYPE_EXT, outType);
         glProgramParameteriEXT(program, GL_GEOMETRY_VERTICES_OUT_EXT, verticesOut);
     }
-
+*/
     glLinkProgram(program);
 
     glDeleteShader(vertexShader);
-    glDeleteShader(geometryShader);
+    //glDeleteShader(geometryShader);
     glDeleteShader(fragmentShader);
 
     // FIXME actually check for successful link
