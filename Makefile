@@ -90,7 +90,7 @@ trajectories_sample:
 scan_sample: 
 	$(call chdir,OpenCL_Parallel_Prefix_Sum_Example/)
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) scan.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
-	$(PRELOAD) TrajectoriesKernel.cl \
+	$(PRELOAD) scan_kernel.cl \
 	-o ../build/osx_scan.js
 
 reduce_sample: 

@@ -616,6 +616,21 @@ void ScanReference( float* reference, float* input, const unsigned int count)
 int main(int argc, char **argv)
 {
     int i;
+    int use_gpu = 1;
+    for(i = 0; i < argc && argv; i++)
+    {
+        if(!argv[i])
+            continue;
+            
+        if(strstr(argv[i], "cpu"))
+            use_gpu = 0;        
+
+        else if(strstr(argv[i], "gpu"))
+            use_gpu = 1;
+    }
+    
+    printf("Parameter detect %s device\n",use_gpu==1?"GPU":"CPU");
+
     #ifdef __EMSCRIPTEN__
     float         t0 = 0;
     float         t1 = 0;
@@ -639,7 +654,7 @@ int main(int argc, char **argv)
 
     // Connect to a GPU compute device
     //
-    err = clGetDeviceIDs(NULL, CL_DEVICE_TYPE_GPU, 1, &ComputeDeviceId, NULL);
+    err = clGetDeviceIDs(NULL, use_gpu ? CL_DEVICE_TYPE_GPU : CL_DEVICE_TYPE_CPU, 1, &ComputeDeviceId, NULL);
     if (err != CL_SUCCESS)
     {
         printf("Error: Failed to locate a compute device!\n");

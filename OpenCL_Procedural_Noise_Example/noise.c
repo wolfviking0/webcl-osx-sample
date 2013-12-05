@@ -72,7 +72,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define USE_GL_ATTACHMENTS (1)             // enable OpenGL attachments for Compute results
+static int USE_GL_ATTACHMENTS = 0;         // enable OpenGL attachments for Compute results
 #define DEBUG_INFO         (0)             // enable debug info
 #define SEPARATOR          ("----------------------------------------------------------------------\n")
 
@@ -85,9 +85,7 @@ static cl_program                               ComputeProgram;
 static cl_device_id                             ComputeDeviceId;
 static cl_device_type                           ComputeDeviceType;
 static cl_mem                                   ComputeResult;
-#if USE_GL_ATTACHMENTS
 static cl_mem                                   ComputeImage;
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -273,10 +271,10 @@ CreateTexture(uint width, uint height)
                 TextureFormat, TextureType, HostImageBuffer);
     glBindTexture(TextureTarget, 0);
 
-#if USE_GL_ATTACHMENTS
-    free(HostImageBuffer);
-    HostImageBuffer = 0;
-#endif
+    if (USE_GL_ATTACHMENTS) {
+        free(HostImageBuffer);
+        HostImageBuffer = 0;
+    }
 }
 
 static void 
@@ -413,42 +411,42 @@ Recompute(void)
         return EXIT_FAILURE;
     }
 
-#if USE_GL_ATTACHMENTS
+    if (USE_GL_ATTACHMENTS) {
 
-    err = clEnqueueAcquireGLObjects(ComputeCommands, 1, &ComputeImage, 0, 0, 0);
-    if (err != CL_SUCCESS)
-    {
-        printf("Failed to acquire GL object! %d\n", err);
-        return EXIT_FAILURE;
-    }
+        err = clEnqueueAcquireGLObjects(ComputeCommands, 1, &ComputeImage, 0, 0, 0);
+        if (err != CL_SUCCESS)
+        {
+            printf("Failed to acquire GL object! %d\n", err);
+            return EXIT_FAILURE;
+        }
 
-    size_t origin[] = { 0, 0, 0 };
-    size_t region[] = { Width, Height, 1 };
+        size_t origin[] = { 0, 0, 0 };
+        size_t region[] = { Width, Height, 1 };
 
-    err = clEnqueueCopyBufferToImage(ComputeCommands, ComputeResult, ComputeImage, 
-                                     0, origin, region, 0, NULL, 0);
-    
-    if(err != CL_SUCCESS)
-    {
-        printf("Failed to copy buffer to image! %d\n", err);
-        return EXIT_FAILURE;
-    }
+        err = clEnqueueCopyBufferToImage(ComputeCommands, ComputeResult, ComputeImage, 
+                                         0, origin, region, 0, NULL, 0);
         
-    err = clEnqueueReleaseGLObjects(ComputeCommands, 1, &ComputeImage, 0, 0, 0);
-    if (err != CL_SUCCESS)
-    {
-        printf("Failed to release GL object! %d\n", err);
-        return EXIT_FAILURE;
-    }
+        if(err != CL_SUCCESS)
+        {
+            printf("Failed to copy buffer to image! %d\n", err);
+            return EXIT_FAILURE;
+        }
+            
+        err = clEnqueueReleaseGLObjects(ComputeCommands, 1, &ComputeImage, 0, 0, 0);
+        if (err != CL_SUCCESS)
+        {
+            printf("Failed to release GL object! %d\n", err);
+            return EXIT_FAILURE;
+        }
 
-#else
-    CL_SET_TYPE_POINTER(CL_UNSIGNED_INT8);
-    err = clEnqueueReadBuffer( ComputeCommands, ComputeResult, CL_TRUE, 0, 
-                               Width * Height * TextureTypeSize * 4, 
-                               HostImageBuffer, 0, NULL, NULL );      
-    if (err)
-        return -5;
-#endif
+    } else {
+        CL_SET_TYPE_POINTER(CL_UNSIGNED_INT8);
+        err = clEnqueueReadBuffer( ComputeCommands, ComputeResult, CL_TRUE, 0, 
+                                   Width * Height * TextureTypeSize * 4, 
+                                   HostImageBuffer, 0, NULL, NULL );      
+        if (err)
+            return -5;
+    }
         
     return CL_SUCCESS;
 }
@@ -462,17 +460,17 @@ CreateComputeResult(void)
     int err = 0;
     printf(SEPARATOR);
 
-#if USE_GL_ATTACHMENTS
+    if (USE_GL_ATTACHMENTS) {
 
-    printf("Allocating compute result image...\n");
-	ComputeImage = clCreateFromGLTexture2D(ComputeContext, CL_MEM_WRITE_ONLY, TextureTarget, 0, TextureId, &err);
-    if (!ComputeImage || err != CL_SUCCESS)
-    {
-        printf("Failed to create OpenGL texture reference! %d\n", err);
-        return -1;
+        printf("Allocating compute result image...\n");
+    	ComputeImage = clCreateFromGLTexture2D(ComputeContext, CL_MEM_WRITE_ONLY, TextureTarget, 0, TextureId, &err);
+        if (!ComputeImage || err != CL_SUCCESS)
+        {
+            printf("Failed to create OpenGL texture reference! %d\n", err);
+            return -1;
+        }
+        
     }
-    
-#endif
 
     printf("Allocating compute result buffer...\n");
     ComputeResult = clCreateBuffer(ComputeContext, CL_MEM_WRITE_ONLY, TextureTypeSize * 4 * Width * Height, NULL, &err);
@@ -564,65 +562,65 @@ SetupComputeDevices(int gpu)
 	size_t returned_size;
     ComputeDeviceType = gpu ? CL_DEVICE_TYPE_GPU : CL_DEVICE_TYPE_CPU;
 
-#if (USE_GL_ATTACHMENTS)
+    if (USE_GL_ATTACHMENTS) {
 
-    printf(SEPARATOR);
-    printf("Using active OpenGL context...\n");
+        printf(SEPARATOR);
+        printf("Using active OpenGL context...\n");
 
-    #ifndef __EMSCRIPTEN__
-        CGLContextObj kCGLContext = CGLGetCurrentContext();              
-        CGLShareGroupObj kCGLShareGroup = CGLGetShareGroup(kCGLContext);
-    #endif
+        #ifndef __EMSCRIPTEN__
+            CGLContextObj kCGLContext = CGLGetCurrentContext();              
+            CGLShareGroupObj kCGLShareGroup = CGLGetShareGroup(kCGLContext);
+        #endif
 
-    cl_context_properties properties[] = { 
-    #ifdef __EMSCRIPTEN__
-        CL_CGL_SHAREGROUP_KHR,
-        0,
-    #else
-        CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, 
-        (cl_context_properties)kCGLShareGroup,
-    #endif
-        0
-    };    
+        cl_context_properties properties[] = { 
+        #ifdef __EMSCRIPTEN__
+            CL_CGL_SHAREGROUP_KHR,
+            0,
+        #else
+            CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, 
+            (cl_context_properties)kCGLShareGroup,
+        #endif
+            0
+        };    
 
-    // Create a context from a CGL share group
-    //
-    #ifdef __EMSCRIPTEN__
-        ComputeContext = clCreateContext(properties, 0, 0, NULL, 0, 0);
-    #else
-        ComputeContext = clCreateContext(properties, 0, 0, clLogMessagesToStdoutAPPLE, 0, 0);
-    #endif        
-    if (!ComputeContext)
-    {
-        printf("Error: Failed to create a compute context!\n");
-        return EXIT_FAILURE;
+        // Create a context from a CGL share group
+        //
+        #ifdef __EMSCRIPTEN__
+            ComputeContext = clCreateContext(properties, 0, 0, NULL, 0, 0);
+        #else
+            ComputeContext = clCreateContext(properties, 0, 0, clLogMessagesToStdoutAPPLE, 0, 0);
+        #endif        
+        if (!ComputeContext)
+        {
+            printf("Error: Failed to create a compute context!\n");
+            return EXIT_FAILURE;
+        }
+
+    } else {
+
+        // Locate a compute device
+        //
+        err = clGetDeviceIDs(NULL, ComputeDeviceType, 1, &ComputeDeviceId, NULL);
+        if (err != CL_SUCCESS)
+        {
+            printf("Error: Failed to locate compute device!\n");
+            return EXIT_FAILURE;
+        }
+      
+        // Create a context containing the compute device(s)
+        //
+        #ifdef __EMSCRIPTEN__
+            ComputeContext = clCreateContext(0, 1, &ComputeDeviceId, NULL, NULL, &err);
+        #else
+            ComputeContext = clCreateContext(0, 1, &ComputeDeviceId, clLogMessagesToStdoutAPPLE, NULL, &err);
+        #endif
+        if (!ComputeContext)
+        {
+            printf("Error: Failed to create a compute context!\n");
+            return EXIT_FAILURE;
+        }
+
     }
-
-#else
-
-    // Locate a compute device
-    //
-    err = clGetDeviceIDs(NULL, ComputeDeviceType, 1, &ComputeDeviceId, NULL);
-    if (err != CL_SUCCESS)
-    {
-        printf("Error: Failed to locate compute device!\n");
-        return EXIT_FAILURE;
-    }
-  
-    // Create a context containing the compute device(s)
-    //
-    #ifdef __EMSCRIPTEN__
-        ComputeContext = clCreateContext(0, 1, &ComputeDeviceId, NULL, NULL, &err);
-    #else
-        ComputeContext = clCreateContext(0, 1, &ComputeDeviceId, clLogMessagesToStdoutAPPLE, NULL, &err);
-    #endif
-    if (!ComputeContext)
-    {
-        printf("Error: Failed to create a compute context!\n");
-        return EXIT_FAILURE;
-    }
-
-#endif
 
     unsigned int device_count;
     cl_device_id device_ids[16];
@@ -694,9 +692,8 @@ ShutdownCompute(void)
     clReleaseProgram(ComputeProgram);
     clReleaseCommandQueue(ComputeCommands);
     clReleaseMemObject(ComputeResult);
-#if USE_GL_ATTACHMENTS
-    clReleaseMemObject(ComputeImage);
-#endif
+    if (USE_GL_ATTACHMENTS)
+        clReleaseMemObject(ComputeImage);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1116,26 +1113,26 @@ Mouse(int button, int state, int x, int y)
 
 int main(int argc, char** argv)
 {
-    int use_gpu = 1;
-    
     // Parse command line options
     //
     int i;
-    for( i = 0; i < argc && argv; i++)
+    int use_gpu = 1;
+    for(i = 0; i < argc && argv; i++)
     {
         if(!argv[i])
             continue;
             
         if(strstr(argv[i], "cpu"))
-        {
             use_gpu = 0;        
-        }
+
         else if(strstr(argv[i], "gpu"))
-        {
             use_gpu = 1;
-        }
+        
+        else if(strstr(argv[i], "interop"))
+            USE_GL_ATTACHMENTS = 1;
     }
 
+    printf("Parameter detect %s device\n",use_gpu==1?"GPU":"CPU");
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize (Width, Height);

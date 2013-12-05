@@ -110,17 +110,31 @@ int main(int argc, char** argv)
     cl_mem input;                       // device memory used for the input array
     cl_mem output;                      // device memory used for the output array
     
+    int i;
+    int use_gpu = 1;
+    for(i = 0; i < argc && argv; i++)
+    {
+        if(!argv[i])
+            continue;
+            
+        if(strstr(argv[i], "cpu"))
+            use_gpu = 0;        
+
+        else if(strstr(argv[i], "gpu"))
+            use_gpu = 1;
+    }
+
+    printf("Parameter detect %s device\n",use_gpu==1?"GPU":"CPU");
+
     // Fill our data set with random float values
     //
-    int i = 0;
     unsigned int count = DATA_SIZE;
     for(i = 0; i < count; i++)
         data[i] = rand() / (float)RAND_MAX;
     
     // Connect to a compute device
     //
-    int gpu = 1;
-    err = clGetDeviceIDs(NULL, gpu ? CL_DEVICE_TYPE_GPU : CL_DEVICE_TYPE_CPU, 1, &device_id, NULL);
+    err = clGetDeviceIDs(NULL, use_gpu ? CL_DEVICE_TYPE_GPU : CL_DEVICE_TYPE_CPU, 1, &device_id, NULL);
     if (err != CL_SUCCESS)
     {
         printf("Error: Failed to create a device group!\n");
