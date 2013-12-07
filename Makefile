@@ -56,25 +56,25 @@ all: \
 
 hello_sample: 
 	$(call chdir,OpenCL_Hello_World_Example/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) hello.c $(MODE) \
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) hello.c $(MODE) \
 	-o ../build/$(PREFIX)osx_hello.js
 	
 transpose_sample: 
 	$(call chdir,OpenCL_Matrix_Transpose_Example/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) transpose.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) transpose.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
 	$(PRELOAD) transpose_kernel.cl \
 	-o ../build/$(PREFIX)osx_transpose.js
 
 histogram_sample: 
 	$(call chdir,gpu_histogram/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) gpu_histogram.c $(MODE) -s TOTAL_MEMORY=1024*1024*100 \
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) gpu_histogram.c $(MODE) -s TOTAL_MEMORY=1024*1024*100 \
 	$(PRELOAD) gpu_histogram_buffer.cl \
 	$(PRELOAD) gpu_histogram_image.cl \
 	-o ../build/$(PREFIX)osx_histogram.js
 
 trajectories_sample: 
 	$(call chdir,Trajectories/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) \
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) \
 	Sources/Main/Trajectories.cpp \
 	Sources/OpenCL/Sources/OpenCLBuffer.cpp \
 	Sources/OpenCL/Sources/OpenCLFile.cpp \
@@ -90,13 +90,13 @@ trajectories_sample:
 
 scan_sample: 
 	$(call chdir,OpenCL_Parallel_Prefix_Sum_Example/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) scan.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) scan.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
 	$(PRELOAD) scan_kernel.cl \
 	-o ../build/$(PREFIX)osx_scan.js
 
 reduce_sample: 
 	$(call chdir,OpenCL_Parallel_Reduction_Example/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) reduce.c $(MODE) -s TOTAL_MEMORY=1024*1024*50 \
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) reduce.c $(MODE) -s TOTAL_MEMORY=1024*1024*50 \
 	$(PRELOAD) reduce_float_kernel.cl \
 	$(PRELOAD) reduce_float2_kernel.cl \
 	$(PRELOAD) reduce_float4_kernel.cl \
@@ -107,19 +107,19 @@ reduce_sample:
 
 noise_sample: 
 	$(call chdir,OpenCL_Procedural_Noise_Example/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) noise.c -s LEGACY_GL_EMULATION=1 $(MODE) \
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) noise.c -s LEGACY_GL_EMULATION=1 $(MODE) \
 	$(PRELOAD) noise_kernel.cl \
 	-o ../build/$(PREFIX)osx_noise.js
 
 qjulia_sample: 
 	$(call chdir,OpenCL_RayTraced_Quaternion_Julia-Set_Example/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) qjulia.c -s LEGACY_GL_EMULATION=1 $(MODE) \
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) qjulia.c -s LEGACY_GL_EMULATION=1 $(MODE) \
 	$(PRELOAD) qjulia_kernel.cl \
 	-o ../build/$(PREFIX)osx_qjulia.js	
 
 galaxies_sample: 
 	$(call chdir,OpenCL_NBody_Simulation_Example/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=1 $(CXX) \
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) \
 	counter.cpp \
 	data.cpp \
 	graphics.cpp \
