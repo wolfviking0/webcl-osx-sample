@@ -12,12 +12,10 @@ DEB=0
 VAL=0
 
 ifeq ($(VAL),1)
-PRELOAD = --preload-file-validator
-PREFIX = "val_"
+PREFIX = val_
 $(info ************  Mode VALIDATOR : Enabled ************)
 else
-PRELOAD = --preload-file
-PREFIX = ""
+PREFIX = 
 $(info ************  Mode VALIDATOR : Disabled ************)
 endif
 
@@ -62,14 +60,14 @@ hello_sample:
 transpose_sample: 
 	$(call chdir,OpenCL_Matrix_Transpose_Example/)
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) transpose.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
-	$(PRELOAD) transpose_kernel.cl \
+	--preload-file transpose_kernel.cl \
 	-o ../build/$(PREFIX)osx_transpose.js
 
 histogram_sample: 
 	$(call chdir,gpu_histogram/)
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) gpu_histogram.c $(MODE) -s TOTAL_MEMORY=1024*1024*100 \
-	$(PRELOAD) gpu_histogram_buffer.cl \
-	$(PRELOAD) gpu_histogram_image.cl \
+	--preload-file gpu_histogram_buffer.cl \
+	--preload-file gpu_histogram_image.cl \
 	-o ../build/$(PREFIX)osx_histogram.js
 
 trajectories_sample: 
@@ -85,36 +83,36 @@ trajectories_sample:
 	-I./Sources/Main/ \
 	-I./Sources/OpenCL/Headers/ \
 	$(MODE) \
-	$(PRELOAD) Sources/Kernel/TrajectoriesKernel.cl \
+	--preload-file Sources/Kernel/TrajectoriesKernel.cl \
 	-o ../build/$(PREFIX)osx_trajectories.js
 
 scan_sample: 
 	$(call chdir,OpenCL_Parallel_Prefix_Sum_Example/)
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) scan.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
-	$(PRELOAD) scan_kernel.cl \
+	--preload-file scan_kernel.cl \
 	-o ../build/$(PREFIX)osx_scan.js
 
 reduce_sample: 
 	$(call chdir,OpenCL_Parallel_Reduction_Example/)
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) reduce.c $(MODE) -s TOTAL_MEMORY=1024*1024*50 \
-	$(PRELOAD) reduce_float_kernel.cl \
-	$(PRELOAD) reduce_float2_kernel.cl \
-	$(PRELOAD) reduce_float4_kernel.cl \
-	$(PRELOAD) reduce_int_kernel.cl \
-	$(PRELOAD) reduce_int2_kernel.cl \
-	$(PRELOAD) reduce_int4_kernel.cl \
+	--preload-file reduce_float_kernel.cl \
+	--preload-file reduce_float2_kernel.cl \
+	--preload-file reduce_float4_kernel.cl \
+	--preload-file reduce_int_kernel.cl \
+	--preload-file reduce_int2_kernel.cl \
+	--preload-file reduce_int4_kernel.cl \
 	-o ../build/$(PREFIX)osx_reduce.js
 
 noise_sample: 
 	$(call chdir,OpenCL_Procedural_Noise_Example/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) noise.c -s LEGACY_GL_EMULATION=1 $(MODE) \
-	$(PRELOAD) noise_kernel.cl \
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) noise.c  -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 $(MODE) \
+	--preload-file noise_kernel.cl \
 	-o ../build/$(PREFIX)osx_noise.js
 
 qjulia_sample: 
 	$(call chdir,OpenCL_RayTraced_Quaternion_Julia-Set_Example/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) qjulia.c -s LEGACY_GL_EMULATION=1 $(MODE) \
-	$(PRELOAD) qjulia_kernel.cl \
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) qjulia.c  -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 $(MODE) \
+	--preload-file qjulia_kernel.cl \
 	-o ../build/$(PREFIX)osx_qjulia.js	
 
 galaxies_sample: 
@@ -131,12 +129,12 @@ galaxies_sample:
 	types.cpp \
 	-D__JAVASCRIPT__ \
 	-s TOTAL_MEMORY=1024*1024*100 \
-	-s LEGACY_GL_EMULATION=1 $(MODE) \
+	 -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 $(MODE) \
 	--preload-file nbody.fsh \
 	--preload-file nbody.vsh \
 	--preload-file star.png \
-	$(PRELOAD) nbody_gpu.cl \
-	$(PRELOAD) nbody_cpu.cl \
+	--preload-file nbody_gpu.cl \
+	--preload-file nbody_cpu.cl \
 	--preload-file bodies_16k.dat \
 	--preload-file bodies_24k.dat \
 	--preload-file bodies_32k.dat \
