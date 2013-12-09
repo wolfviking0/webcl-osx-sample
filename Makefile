@@ -1,3 +1,10 @@
+#
+#  Makefile
+#
+#  Created by Anthony Liot.
+#  Copyright (c) 2013 Anthony Liot. All rights reserved.
+#
+
 EMSCRIPTEN_ROOT:=../../webcl-translator/emscripten
 
 CXX = $(EMSCRIPTEN_ROOT)/emcc
