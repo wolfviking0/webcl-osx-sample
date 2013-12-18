@@ -170,6 +170,7 @@ galaxies_sample_osx:
 
 clean:
 	$(call chdir,build/)
+	rm -rf tmp/	
 	mkdir tmp
 	cp memoryprofiler.js tmp/
 	cp settings.js tmp/
