@@ -5,9 +5,13 @@
 #  Copyright (c) 2013 Anthony Liot. All rights reserved.
 #
 
-EMSCRIPTEN_ROOT:=../../webcl-translator/emscripten
+CURRENT_ROOT:=$(PWD)/
 
-CXX = $(EMSCRIPTEN_ROOT)/emcc
+EMSCRIPTEN_ROOT:=$(CURRENT_ROOT)../webcl-translator/emscripten
+
+CXX = $(EMSCRIPTEN_ROOT)/em++
+
+CC = $(EMSCRIPTEN_ROOT)/emcc
 
 CHDIR_SHELL := $(SHELL)
 define chdir
@@ -76,13 +80,13 @@ hello_sample:
 	
 transpose_sample: 
 	$(call chdir,OpenCL_Matrix_Transpose_Example/)
-	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) transpose.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
+	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CC) transpose.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
 	--preload-file transpose_kernel.cl \
 	-o ../build/$(PREFIX)osx_transpose.js
 
 histogram_sample: 
 	$(call chdir,gpu_histogram/)
-	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) gpu_histogram.c $(MODE) -s TOTAL_MEMORY=1024*1024*100 \
+	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CC) gpu_histogram.c $(MODE) -s TOTAL_MEMORY=1024*1024*100 \
 	--preload-file gpu_histogram_buffer.cl \
 	--preload-file gpu_histogram_image.cl \
 	-o ../build/$(PREFIX)osx_histogram.js
@@ -105,13 +109,13 @@ trajectories_sample:
 
 scan_sample: 
 	$(call chdir,OpenCL_Parallel_Prefix_Sum_Example/)
-	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) scan.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
+	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CC) scan.c $(MODE) -s TOTAL_MEMORY=1024*1024*30 \
 	--preload-file scan_kernel.cl \
 	-o ../build/$(PREFIX)osx_scan.js
 
 reduce_sample: 
 	$(call chdir,OpenCL_Parallel_Reduction_Example/)
-	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) reduce.c $(MODE) -s TOTAL_MEMORY=1024*1024*50 \
+	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CC) reduce.c $(MODE) -s TOTAL_MEMORY=1024*1024*50 \
 	--preload-file reduce_float_kernel.cl \
 	--preload-file reduce_float2_kernel.cl \
 	--preload-file reduce_float4_kernel.cl \
@@ -122,13 +126,13 @@ reduce_sample:
 
 noise_sample: 
 	$(call chdir,OpenCL_Procedural_Noise_Example/)
-	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) noise.c  -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 $(MODE) \
+	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CC) noise.c  -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 $(MODE) \
 	--preload-file noise_kernel.cl \
 	-o ../build/$(PREFIX)osx_noise.js
 
 qjulia_sample: 
 	$(call chdir,OpenCL_RayTraced_Quaternion_Julia-Set_Example/)
-	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) qjulia.c  -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 $(MODE) \
+	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CC) qjulia.c  -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 $(MODE) \
 	--preload-file qjulia_kernel.cl \
 	-o ../build/$(PREFIX)osx_qjulia.js	
 
