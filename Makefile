@@ -78,7 +78,6 @@ all: all_1 all_2 all_3
 all_1: \
 	hello_sample \
 	transpose_sample \
-	histogram_sample \
 
 all_2: \
 	trajectories_sample \
@@ -88,7 +87,9 @@ all_2: \
 all_3: \
 	noise_sample \
 	qjulia_sample \
-	galaxies_sample \
+
+#histogram_sample \
+#galaxies_sample \
 
 hello_sample: 
 	$(call chdir,OpenCL_Hello_World_Example/)

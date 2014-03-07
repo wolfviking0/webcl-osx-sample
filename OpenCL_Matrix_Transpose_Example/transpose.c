@@ -80,6 +80,7 @@
 #include <stdlib.h>
 #ifdef __EMSCRIPTEN__
 #include <CL/opencl.h>
+#include <emscripten/emscripten.h>
 #else
 #include <libc.h>
 #include <OpenCL/opencl.h>

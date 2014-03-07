@@ -59,6 +59,7 @@
 #include <math.h>
 #ifdef __EMSCRIPTEN__
 #include <CL/opencl.h>
+#include <emscripten/emscripten.h>
 #else
 #include <mach/mach_time.h>
 #include <libc.h>

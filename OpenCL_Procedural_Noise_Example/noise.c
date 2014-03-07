@@ -63,6 +63,7 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
 #include <CL/opencl.h>
+#include <emscripten/emscripten.h>
 #else
 #include <OpenGL/OpenGL.h>
 #include <OpenCL/opencl.h>
