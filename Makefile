@@ -196,6 +196,21 @@ galaxies_sample_osx:
 	-I./ -I$(EMCC)/system/include/ -framework OpenCL -framework OpenGL -framework GLUT \
 	-o galaxies.out
 
+trajectories_sample_osx: 
+	$(call chdir,Trajectories/)
+	clang++ -O2 \
+	Sources/Main/Trajectories.cpp \
+	Sources/OpenCL/Sources/OpenCLBuffer.cpp \
+	Sources/OpenCL/Sources/OpenCLFile.cpp \
+	Sources/OpenCL/Sources/OpenCLKernel.cpp \
+	Sources/OpenCL/Sources/OpenCLProgram.cpp \
+	Sources/Trajectory/Trajectory.cpp \
+	-I./Sources/Trajectory/ \
+	-I./Sources/Main/ \
+	-I./Sources/OpenCL/Headers/ \
+	-I./ -I$(EMCC)/system/include/ -framework OpenCL \
+	-o trajectories.out
+
 clean:
 	$(call chdir,build/)
 	rm -rf tmp/	
