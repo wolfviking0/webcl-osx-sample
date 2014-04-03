@@ -48,6 +48,8 @@
 
 //---------------------------------------------------------------------------
 
+extern int USE_GPU;
+
 #include <iostream>
 
 //---------------------------------------------------------------------------
@@ -368,7 +370,10 @@ Program::Program( const std::string &rFileName ) : File( rFileName )
 	
 	if( mpProgram != NULL )
 	{
-		mpProgram->mnDeviceType         = CL_DEVICE_TYPE_GPU;
+		
+		printf("Program::Program Trajectories detect %s device\n",USE_GPU==1?"GPU":"CPU");
+
+		mpProgram->mnDeviceType         = USE_GPU?CL_DEVICE_TYPE_GPU:CL_DEVICE_TYPE_CPU;
 		mpProgram->mnDeviceEntries      = 1;
 		mpProgram->mnDeviceCount        = 1;
 		mpProgram->mnPlatformCount      = 1;

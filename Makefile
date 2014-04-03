@@ -124,10 +124,10 @@ KERNEL_noise			= 	--preload-file noise_kernel.cl
 KERNEL_qjulia			= 	--preload-file qjulia_kernel.cl
 
 CFLAGS_hello			=	
-CFLAGS_transpose		=	
+CFLAGS_transpose		=	-s TOTAL_MEMORY=1024*104*250
 CFLAGS_trajectories		=	
-CFLAGS_scan				=	
-CFLAGS_reduce			=	
+CFLAGS_scan				=	-s TOTAL_MEMORY=1024*104*250
+CFLAGS_reduce			=	-s TOTAL_MEMORY=1024*104*250
 CFLAGS_noise			=	-s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1
 CFLAGS_qjulia			=	-s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1
 

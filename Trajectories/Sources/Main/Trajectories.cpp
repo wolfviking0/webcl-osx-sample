@@ -51,6 +51,8 @@
 
 #include <cmath>
 
+int USE_GPU = 1;
+
 //---------------------------------------------------------------------------
 
 #include "Trajectory.h"
@@ -72,6 +74,18 @@ static const float kAngle     = M_PI / 4.0f;
 
 int main( int argc, char **argv )
 {
+ 	for(int i = 0; i < argc && argv; i++)
+    {
+        if(!argv[i])
+            continue;
+            
+        if(strstr(argv[i], "cpu"))
+            USE_GPU = 0;        
+
+        else if(strstr(argv[i], "gpu"))
+            USE_GPU = 1;
+    }
+
 	Trajectory trajectory("Sources/Kernel/TrajectoriesKernel.cl",kTimeMax,kTimeDelta);
 	
 	if( trajectory.Acquire("Trajectory1") )
