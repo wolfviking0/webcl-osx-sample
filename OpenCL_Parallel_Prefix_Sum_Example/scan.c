@@ -689,7 +689,7 @@ int main(int argc, char **argv)
     // Load the compute program from disk into a cstring buffer
     //
     printf(SEPARATOR);
-    const char* filename = "./../../scan_kernel.cl";
+    const char* filename = "./scan_kernel.cl";
     printf("Loading program '%s'...\n", filename);
     printf(SEPARATOR);
 

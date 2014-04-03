@@ -75,8 +75,8 @@
 #include <OpenGL/CGLDevice.h>
 #include <GLUT/glut.h>
 #include <OpenCL/opencl.h>
-
 #include <mach/mach_time.h>
+#define CL_SET_TYPE_POINTER(x)
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
