@@ -12,7 +12,7 @@ VAL  		= 0
 NAT  		= 0
 ORIG 		= 0
 FAST 		= 1
-NODEJS 	= 0
+NODEJS 		= 0
 
 # Chdir function
 CHDIR_SHELL := $(SHELL)
