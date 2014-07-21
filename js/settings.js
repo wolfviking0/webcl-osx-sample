@@ -19,20 +19,20 @@ var NODE_ENV = 0;
 // Global Time
 var Elapsed_time = 0;
 
-if (typeof window === 'object') {
+if (!(typeof process === 'object' && typeof require === 'function')) {
 
   // parse parameter of html page
   if (typeof pageParams === 'undefined') {
     var pageParams = window.location.search || '';
-  }  
-  
+  }
+
   if (pageParams[0] == '?') pageParams = pageParams.substr(1);
   var urlParts = pageParams.split('&');
 
 } else {
 
   var urlParts = global.urlParts;
-  
+
   NODE_ENV = 1;
 
 }
@@ -46,19 +46,19 @@ for (var i = 0; i < urlParts.length; i++) {
   } else if (eltParts[0].toLowerCase() == "gl") {
     USE_GL = eltParts[1] == "off" ? 0 : 1;
   } else if (eltParts[0].toLowerCase() == "export") {
-    EXPORT = eltParts[1] == "off" ? 0 : 1; 
+    EXPORT = eltParts[1] == "off" ? 0 : 1;
   } else if (eltParts[0].toLowerCase() == "memory") {
-    MEMORY = eltParts[1] == "off" ? 0 : 1; 
+    MEMORY = eltParts[1] == "off" ? 0 : 1;
   } else if (eltParts[0].toLowerCase() == "profile") {
-    PROFILE = eltParts[1] == "off" ? 0 : 1;     
+    PROFILE = eltParts[1] == "off" ? 0 : 1;
   } else if (eltParts[0].toLowerCase() == "validator") {
-    USE_VAL = eltParts[1] == "off" ? "" : "val_";     
+    USE_VAL = eltParts[1] == "off" ? "" : "val_";
   } else if (eltParts[0].toLowerCase() == "title") {
     TITLE = eltParts[1];
     TITLE = TITLE.replace(/%20/gi, " ");
   } else {
     PARAM.push(eltParts);
-  } 
+  }
 }
 
 function includeJS(jsFile) {
@@ -74,13 +74,13 @@ function loadModule(argv) {
   // connect to canvas
   var preRunFunc = [];
   var postRunFunc = [];
-  
+
   /**
   * PRE RUN FUNCTION
   */
   if (MEMORY == 1)
     preRunFunc.push(memoryprofiler_add_hooks);
-    
+
   if (PROFILE == 1) {
     preRunFunc.push(
       function() {
@@ -88,9 +88,9 @@ function loadModule(argv) {
         if (typeof window !== 'undefined')
           console.profile("webcl-profiling-result");
       }
-    ); 
+    );
   }
-  	
+
   /**
   * POST RUN FUNCTION
   */
@@ -107,12 +107,12 @@ function loadModule(argv) {
           console.info("\t"+(count++)+" : "+CL.cl_objects[obj]);
         }
       }
-    ); 
+    );
   }
 
   if (EXPORT == 1) {
     postRunFunc.push(
-      function() { 
+      function() {
         var string = "";
 
         if (PROFILE == 1) {
@@ -130,7 +130,7 @@ function loadModule(argv) {
         }
         string+="\n";
         string+="\n";
-        
+
         var element = document.getElementById('output');
         if (element) {
           string+="OUTPUT\n"
@@ -142,7 +142,7 @@ function loadModule(argv) {
         }
         string+="\n";
         string+="\n";
-        
+
         if (CL.stack_trace_complete) {
           string+="STACK TRACER\n";
           string+="______________________________________________\n";
@@ -160,9 +160,9 @@ function loadModule(argv) {
         a.click();
 
       }
-    );    
+    );
   }
-    
+
   Module = {
     preRun: preRunFunc,
 	  postRun: postRunFunc,
@@ -185,12 +185,13 @@ function loadModule(argv) {
     printErr: function(text) {
       text = Array.prototype.slice.call(arguments).join(' ');
       console.error(text);
-		},      
+		},
     canvas:(function() {
       if (!NODE_ENV) {
         return document.getElementById('glCanvas');
       } else {
-        return {};
+        var canvas = document.createElement("glCanvas", 512, 512);
+        return canvas;
       }
     })(),
     setStatus:
@@ -229,12 +230,12 @@ function loadModule(argv) {
           Module['setStatus'](left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
         }
   };
-  
+
   Module['setStatus']('Downloading...');
   Module['noImageDecoding'] = true;
   Module['noAudioDecoding'] = true;
   Module['arguments'] = argv;
-     
+
 }
 
 if (NODE_ENV) loadModule(PARAM);

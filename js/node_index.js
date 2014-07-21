@@ -21,6 +21,11 @@ var samples = [
   "node_qjulia.js",
 ];
 
+WebGL = require('node-webgl');
+document = WebGL.document();
+window = document;
+Image = WebGL.Image;
+
 console.info("Launch WebCL-OSX sample ("+global.sample+") : "+samples[global.sample]);
 
 webcl=require('../../webcl-node/webcl');
