@@ -1,9 +1,14 @@
 
 location = {pathname:process.argv[1]};
 
-var arguments = process.argv.slice(2);
-for (var i = 0; i < arguments.length; i++) {
-  console.log(i + ': ' + arguments[i]);
+global.urlParts = process.argv.slice(2);
+global.sample = 0;
+
+// Global Module
+Module = {};
+
+for (var i = 0; i < global.urlParts.length; i++) {
+  console.log(i + ': ' + global.urlParts[i]);
 }
 
 var samples = [
@@ -16,14 +21,16 @@ var samples = [
   "node_qjulia.js",
 ];
 
-if (arguments.length == 0) {
-  sample = 0;
-} else {
-  sample = arguments[0];
-}
-
-console.info("Launch WebCL-OSX sample ("+sample+") : "+samples[sample]);
+console.info("Launch WebCL-OSX sample ("+global.sample+") : "+samples[global.sample]);
 
 webcl=require('../../webcl-node/webcl');
 
-require('./'+samples[sample]);
+settings=require('./settings.js');
+
+console.info("");
+console.info("****************************************");
+console.info(Module);
+console.info("****************************************");
+console.info("");
+
+require('./'+samples[global.sample]);

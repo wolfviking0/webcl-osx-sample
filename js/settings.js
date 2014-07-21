@@ -14,26 +14,35 @@ var USE_GL = 0;
 var USE_VAL = "";
 var TITLE = "";
 var PARAM = [];
-
-// Global Module
-var Module = {};
+var NODE_ENV = 0;
 
 // Global Time
 var Elapsed_time = 0;
 
-// parse parameter of html page
-if (typeof pageParams === 'undefined') {
-  var pageParams = window.location.search || '';
-}
+if (typeof window === 'object') {
 
-if (pageParams[0] == '?') pageParams = pageParams.substr(1);
-var urlParts = pageParams.split('&');
+  // parse parameter of html page
+  if (typeof pageParams === 'undefined') {
+    var pageParams = window.location.search || '';
+  }  
+  
+  if (pageParams[0] == '?') pageParams = pageParams.substr(1);
+  var urlParts = pageParams.split('&');
+
+} else {
+
+  var urlParts = global.urlParts;
+  
+  NODE_ENV = 1;
+
+}
 
 // set new value with the parameter of url
 for (var i = 0; i < urlParts.length; i++) {
   var eltParts = urlParts[i].split('=');
   if (eltParts[0].toLowerCase() == "sample") {
     SAMPLE = eltParts[1];
+    if (NODE_ENV) global.sample = SAMPLE;
   } else if (eltParts[0].toLowerCase() == "gl") {
     USE_GL = eltParts[1] == "off" ? 0 : 1;
   } else if (eltParts[0].toLowerCase() == "export") {
@@ -102,7 +111,6 @@ function loadModule(argv) {
   }
 
   if (EXPORT == 1) {
-
     postRunFunc.push(
       function() { 
         var string = "";
@@ -159,25 +167,37 @@ function loadModule(argv) {
     preRun: preRunFunc,
 	  postRun: postRunFunc,
     print: (function() {
-      var element = document.getElementById('output');
-      element.value = '';
-      return function(text) {
-      	text = Array.prototype.slice.call(arguments).join(' ');
-      	element.value += text + '\n';
-      	element.scrollTop = 1000000;
-      	//console.log(text);
-      };
+      if (!NODE_ENV) {
+        var element = document.getElementById('output');
+        element.value = '';
+        return function(text) {
+      	 text = Array.prototype.slice.call(arguments).join(' ');
+      	 element.value += text + '\n';
+      	 element.scrollTop = 1000000;
+      	 //console.log(text);
+        };
+      } else {
+        return function(text) {
+          console.log(text);
+        };
+      }
     })(),
     printErr: function(text) {
       text = Array.prototype.slice.call(arguments).join(' ');
       console.error(text);
 		},      
-    canvas:
-      document.getElementById('glCanvas'),
+    canvas:(function() {
+      if (!NODE_ENV) {
+        return document.getElementById('glCanvas');
+      } else {
+        return {};
+      }
+    })(),
     setStatus:
       function(text) {
-        if (Module['setStatus'].interval)
-          clearInterval(Module['setStatus'].interval);
+        if (!NODE_ENV) {
+          if (Module['setStatus'].interval)
+            clearInterval(Module['setStatus'].interval);
           var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
           var statusElement = document.getElementById('status');
           var progressElement = document.getElementById('progress');
@@ -192,7 +212,8 @@ function loadModule(argv) {
             progressElement.hidden = true;
           }
           statusElement.innerHTML = text;
-        },
+        }
+      },
       onFullScreen:
         function(isFullScreen) {
           if (isFullScreen) {
@@ -216,4 +237,5 @@ function loadModule(argv) {
      
 }
 
+if (NODE_ENV) loadModule(PARAM);
 
